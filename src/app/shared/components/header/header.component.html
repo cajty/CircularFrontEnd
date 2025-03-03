@@ -1,36 +1,38 @@
-
-<header class="bg-secondary text-white shadow-sm border-b border-neutral-700">
-  <div class="container mx-auto px-4">
-    <div class="flex items-center justify-between h-16">
-      <!-- Logo with Better Prominence -->
-      <div class="flex items-center space-x-8">
-        <!-- Logo with improved styling -->
+<!-- header.component.html -->
+<header class="bg-secondary text-white shadow-md border-b border-neutral-700 fixed top-0 left-0 right-0 z-30 h-16">
+  <div class="container mx-auto px-4 h-full">
+    <div class="flex items-center justify-between h-full">
+      <!-- Logo -->
+      <div class="flex items-center">
         <a [routerLink]="'/'" class="text-primary font-bold text-2xl tracking-tight">
           Cir<span class="text-white">cular</span>
         </a>
-
-        <!-- Desktop Navigation with Visual Feedback -->
-        <nav class="hidden md:block">
-          <ul class="flex space-x-1">
-            <li><a [routerLink]="'/dashboard'" routerLinkActive="bg-neutral-700" class="px-4 py-2 rounded-md text-white text-sm font-medium hover:bg-neutral-700 transition-colors duration-150">Dashboard</a></li>
-            <li><a [routerLink]="'/marketplace'" routerLinkActive="bg-neutral-700" class="px-4 py-2 rounded-md text-white text-sm font-medium hover:bg-neutral-700 transition-colors duration-150">Marketplace</a></li>
-            <li><a [routerLink]="'/materials'" routerLinkActive="bg-neutral-700" class="px-4 py-2 rounded-md text-white text-sm font-medium hover:bg-neutral-700 transition-colors duration-150">My Materials</a></li>
-            <li><a [routerLink]="'/orders'" routerLinkActive="bg-neutral-700" class="px-4 py-2 rounded-md text-white text-sm font-medium hover:bg-neutral-700 transition-colors duration-150">Orders</a></li>
-          </ul>
-        </nav>
       </div>
 
-      <!-- Right Side Options with Enhanced Styling -->
-      <div class="flex items-center space-x-4">
-        <!-- Search with tooltip -->
-        <button class="text-neutral-300 hover:text-white p-2 rounded-full hover:bg-neutral-700 transition-colors duration-150" title="Search">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-          </svg>
-        </button>
+      <!-- Center Navigation -->
+      <nav class="hidden md:flex items-center space-x-4">
+        <a [routerLink]="'/dashboard'" routerLinkActive="text-primary"
+           class="px-3 py-2 text-neutral-200 hover:text-white text-sm font-medium transition-colors duration-150">
+          Dashboard
+        </a>
+        <a [routerLink]="'/marketplace'" routerLinkActive="text-primary"
+           class="px-3 py-2 text-neutral-200 hover:text-white text-sm font-medium transition-colors duration-150">
+          Marketplace
+        </a>
+        <a [routerLink]="'/materials'" routerLinkActive="text-primary"
+           class="px-3 py-2 text-neutral-200 hover:text-white text-sm font-medium transition-colors duration-150">
+          Materials
+        </a>
+        <a [routerLink]="'/orders'" routerLinkActive="text-primary"
+           class="px-3 py-2 text-neutral-200 hover:text-white text-sm font-medium transition-colors duration-150">
+          Orders
+        </a>
+      </nav>
 
-        <!-- Dark Mode Toggle with better hover state -->
-        <button (click)="toggleDarkMode()" class="text-neutral-300 hover:text-white p-2 rounded-full hover:bg-neutral-700 transition-colors duration-150" title="Toggle Dark Mode">
+      <!-- Right actions -->
+      <div class="flex items-center space-x-3">
+        <!-- Dark Mode Toggle -->
+        <button (click)="toggleDarkMode()" class="text-neutral-300 hover:text-white p-2 rounded-full hover:bg-neutral-700 transition-colors duration-150">
           <svg *ngIf="!isDarkMode" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
           </svg>
@@ -39,46 +41,34 @@
           </svg>
         </button>
 
-        <!-- Notification with improved indicator -->
+        <!-- User Profile -->
         <div class="relative">
-          <button class="text-neutral-300 hover:text-white p-2 rounded-full hover:bg-neutral-700 transition-colors duration-150" title="Notifications">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-            </svg>
-            <span class="absolute top-1 right-1 block h-2.5 w-2.5 rounded-full bg-primary ring-2 ring-secondary animate-pulse"></span>
-          </button>
-        </div>
-
-        <!-- User Profile / Login with Improved Styling -->
-        <div *ngIf="isLoggedIn(); else loginButton" class="relative">
-          <button (click)="toggleMenu()" class="flex items-center space-x-1 text-sm hover:text-primary">
-            <div class="h-8 w-8 rounded-full bg-primary-light text-primary flex items-center justify-center font-medium text-xs">
-              US
+          <button (click)="toggleMenu()" class="flex items-center space-x-1">
+            <div class="h-8 w-8 rounded-full bg-primary text-white flex items-center justify-center font-medium">
+              U
             </div>
-            <span class="hidden md:inline ml-2">User</span>
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-neutral-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
             </svg>
           </button>
 
-          <!-- Dropdown Menu with Enhanced Styling -->
-          <div *ngIf="isMenuOpen" class="absolute right-0 mt-2 w-48 bg-white dark:bg-dark-surface rounded-md shadow-dropdown py-1 z-10">
-            <a [routerLink]="'/profile'" class="block px-4 py-2 text-sm text-neutral-800 dark:text-dark-text hover:bg-neutral-100 dark:hover:bg-dark-border">Profile</a>
-            <a [routerLink]="'/settings'" class="block px-4 py-2 text-sm text-neutral-800 dark:text-dark-text hover:bg-neutral-100 dark:hover:bg-dark-border">Settings</a>
+          <!-- Dropdown Menu -->
+          <div *ngIf="isMenuOpen" class="absolute right-0 mt-2 w-48 bg-white dark:bg-dark-surface rounded-md shadow-dropdown py-1 z-40">
+            <a [routerLink]="'/profile'" class="block px-4 py-2 text-sm text-neutral-800 dark:text-dark-text hover:bg-neutral-100 dark:hover:bg-dark-border">
+              Profile
+            </a>
+            <a [routerLink]="'/settings'" class="block px-4 py-2 text-sm text-neutral-800 dark:text-dark-text hover:bg-neutral-100 dark:hover:bg-dark-border">
+              Settings
+            </a>
             <div class="border-t border-neutral-200 dark:border-dark-border my-1"></div>
-            <button (click)="logout()" class="w-full text-left block px-4 py-2 text-sm text-error hover:bg-neutral-100 dark:hover:bg-dark-border">Logout</button>
+            <button (click)="logout()" class="w-full text-left block px-4 py-2 text-sm text-error hover:bg-neutral-100 dark:hover:bg-dark-border">
+              Logout
+            </button>
           </div>
         </div>
 
-        <!-- Login Button with improved visibility -->
-        <ng-template #loginButton>
-          <a [routerLink]="'/login'" class="bg-primary hover:bg-primary-dark text-white font-medium py-2 px-4 rounded-md transition-colors duration-150">
-            Login
-          </a>
-        </ng-template>
-
-        <!-- Mobile Menu Button with better hover state -->
-        <button (click)="toggleMenu()" class="md:hidden text-neutral-300 hover:text-white p-2 rounded-full hover:bg-neutral-700 transition-colors duration-150">
+        <!-- Mobile menu toggle -->
+        <button (click)="toggleMenu()" class="md:hidden text-neutral-300 hover:text-white">
           <svg *ngIf="!isMenuOpen" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
           </svg>
@@ -88,23 +78,20 @@
         </button>
       </div>
     </div>
+  </div>
 
-    <!-- Mobile Navigation Menu with Improved Styling -->
-    <div *ngIf="isMenuOpen" class="md:hidden py-3 border-t border-neutral-700 animate-fade-in-up">
-      <nav>
-        <ul class="space-y-1">
-          <li><a [routerLink]="'/dashboard'" routerLinkActive="bg-neutral-700" class="block py-2 px-3 rounded-md text-white hover:bg-neutral-700 transition-colors duration-150" (click)="isMenuOpen = false">Dashboard</a></li>
-          <li><a [routerLink]="'/marketplace'" routerLinkActive="bg-neutral-700" class="block py-2 px-3 rounded-md text-white hover:bg-neutral-700 transition-colors duration-150" (click)="isMenuOpen = false">Marketplace</a></li>
-          <li><a [routerLink]="'/materials'" routerLinkActive="bg-neutral-700" class="block py-2 px-3 rounded-md text-white hover:bg-neutral-700 transition-colors duration-150" (click)="isMenuOpen = false">My Materials</a></li>
-          <li><a [routerLink]="'/orders'" routerLinkActive="bg-neutral-700" class="block py-2 px-3 rounded-md text-white hover:bg-neutral-700 transition-colors duration-150" (click)="isMenuOpen = false">Orders</a></li>
-          <li *ngIf="!isLoggedIn()"><a [routerLink]="'/login'" class="block py-2 px-3 rounded-md text-white hover:bg-neutral-700 transition-colors duration-150" (click)="isMenuOpen = false">Login</a></li>
-          <li *ngIf="isLoggedIn()"><button (click)="logout()" class="w-full text-left block py-2 px-3 rounded-md text-error hover:bg-neutral-700 transition-colors duration-150">Logout</button></li>
-        </ul>
-      </nav>
-    </div>
+  <!-- Mobile Navigation Menu -->
+  <div *ngIf="isMenuOpen" class="md:hidden py-3 border-t border-neutral-700 bg-secondary animate-fade-in-up">
+    <nav class="container mx-auto px-4">
+      <ul class="space-y-1">
+        <li><a [routerLink]="'/dashboard'" routerLinkActive="bg-neutral-700" class="block py-2 px-3 rounded-md text-white hover:bg-neutral-700 transition-colors duration-150" (click)="isMenuOpen = false">Dashboard</a></li>
+        <li><a [routerLink]="'/marketplace'" routerLinkActive="bg-neutral-700" class="block py-2 px-3 rounded-md text-white hover:bg-neutral-700 transition-colors duration-150" (click)="isMenuOpen = false">Marketplace</a></li>
+        <li><a [routerLink]="'/materials'" routerLinkActive="bg-neutral-700" class="block py-2 px-3 rounded-md text-white hover:bg-neutral-700 transition-colors duration-150" (click)="isMenuOpen = false">Materials</a></li>
+        <li><a [routerLink]="'/orders'" routerLinkActive="bg-neutral-700" class="block py-2 px-3 rounded-md text-white hover:bg-neutral-700 transition-colors duration-150" (click)="isMenuOpen = false">Orders</a></li>
+      </ul>
+    </nav>
   </div>
 </header>
-
 
 <style>
   @keyframes fade-in-up {

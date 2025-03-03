@@ -1,78 +1,48 @@
+// app.component.ts
 import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { RouterOutlet } from '@angular/router';
+import { SidebarComponent } from './shared/components/sidebar/sidebar.component';
 import { HeaderComponent } from './shared/components/header/header.component';
 import { FooterComponent } from './shared/components/footer/footer.component';
 
-
 @Component({
   selector: 'app-root',
+  standalone: true,
+  imports: [CommonModule, RouterOutlet, SidebarComponent, HeaderComponent, FooterComponent],
   templateUrl: './app.component.html',
-  imports: [
-    HeaderComponent,
-    FooterComponent,
-
-  ],
   styleUrls: ['./app.component.css']
 })
 export class AppComponent implements OnInit {
-  title = 'recyclable-marketplace';
-  isDarkMode = false;
-
-  constructor() {}
+  title = 'circular-economy';
+  darkMode = false;
 
   ngOnInit() {
-    // Check if dark mode preference exists in localStorage
+    // Check for user's dark mode preference
+    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+      this.darkMode = true;
+      document.documentElement.classList.add('dark');
+    }
+
+    // Check for saved dark mode preference
     const savedDarkMode = localStorage.getItem('darkMode');
     if (savedDarkMode) {
-      this.setDarkMode(savedDarkMode === 'true');
+      this.darkMode = savedDarkMode === 'true';
+      this.setDarkMode(this.darkMode);
     }
   }
 
   toggleDarkMode() {
-    this.setDarkMode(!this.isDarkMode);
-
-    // Show toast when dark mode is toggled
-    this.showToast(
-      this.isDarkMode ? 'Dark mode enabled' : 'Light mode enabled',
-      'info'
-    );
+    this.darkMode = !this.darkMode;
+    this.setDarkMode(this.darkMode);
   }
 
   setDarkMode(isDark: boolean) {
-    this.isDarkMode = isDark;
-
     if (isDark) {
       document.documentElement.classList.add('dark');
     } else {
       document.documentElement.classList.remove('dark');
     }
-
-    // Save preference to localStorage
-    localStorage.setItem('darkMode', this.isDarkMode.toString());
-  }
-
-  // Toast methods
-  showToast(message: string, type: 'success' | 'error' | 'warning' | 'info' = 'info', duration: number = 5000) {
-    const panelClass = [
-      `toast-${type}`,
-      this.isDarkMode ? 'dark-mode' : 'light-mode'
-    ];
-
-
-  }
-
-  showSuccessToast(message: string, duration?: number) {
-    this.showToast(message, 'success', duration);
-  }
-
-  showErrorToast(message: string, duration?: number) {
-    this.showToast(message, 'error', duration);
-  }
-
-  showWarningToast(message: string, duration?: number) {
-    this.showToast(message, 'warning', duration);
-  }
-
-  showInfoToast(message: string, duration?: number) {
-    this.showToast(message, 'info', duration);
+    localStorage.setItem('darkMode', isDark.toString());
   }
 }

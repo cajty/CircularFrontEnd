@@ -1,0 +1,110 @@
+<!-- sidebar.component.html -->
+<!-- Drawer component with two states (expanded/collapsed) -->
+<div id="drawer-navigation"
+     class="fixed top-16 left-0 z-40 h-screen overflow-y-auto bg-neutral-800 dark:bg-dark-bg border-r border-neutral-700 dark:border-dark-border transition-all duration-300 shadow-xl"
+     [ngClass]="{'w-64': isDrawerOpen, 'w-16': !isDrawerOpen}"
+     tabindex="-1">
+
+  <!-- User profile section -->
+  <div class="relative border-b border-neutral-700 dark:border-dark-border bg-neutral-900/30">
+    <div class="flex items-center p-3" [ngClass]="{'justify-between': isDrawerOpen, 'justify-center py-4': !isDrawerOpen}">
+      <!-- User profile - expanded state -->
+      <div *ngIf="isDrawerOpen" class="flex items-center">
+        <div class="h-12 w-12 rounded-full bg-primary flex items-center justify-center text-white font-semibold text-lg">
+          {{username.charAt(0).toUpperCase()}}
+        </div>
+        <div class="ml-3">
+          <p class="text-white font-medium">{{username}}</p>
+          <p class="text-neutral-400 text-xs">{{userRole}}</p>
+        </div>
+      </div>
+
+      <!-- User avatar only - collapsed state -->
+      <div *ngIf="!isDrawerOpen" class="h-10 w-10 rounded-full bg-primary flex items-center justify-center text-white font-semibold">
+        {{username.charAt(0).toUpperCase()}}
+      </div>
+
+      <!-- Toggle button -->
+      <button type="button"
+              (click)="toggleDrawer()"
+              class="bg-neutral-700/70 hover:bg-neutral-600 text-white rounded p-1.5 transition-colors duration-150">
+        <svg *ngIf="isDrawerOpen" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+        </svg>
+        <svg *ngIf="!isDrawerOpen" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Navigation menu -->
+  <div class="py-4 overflow-y-auto">
+    @for (category of categories; track category.name) {
+      <!-- Category title - only visible when expanded -->
+      <div *ngIf="isDrawerOpen" class="px-4 py-2">
+        <h3 class="text-neutral-400 uppercase text-xs font-semibold tracking-wider">{{category.name}}</h3>
+      </div>
+
+      <!-- Separator when collapsed -->
+      <div *ngIf="!isDrawerOpen" class="border-t border-neutral-700/50 dark:border-dark-border/50 my-2 mx-2"></div>
+
+      <!-- Navigation links -->
+      <ul class="space-y-1 mb-6" [ngClass]="{'px-3': isDrawerOpen, 'px-2': !isDrawerOpen}">
+        @for (link of category.links; track link.route) {
+          <li>
+            <a [routerLink]="link.route"
+               routerLinkActive="bg-neutral-700 text-white"
+               [routerLinkActiveOptions]="{exact: true}"
+               class="flex items-center rounded-md hover:bg-neutral-700 hover:text-white transition-all duration-150 group"
+               [ngClass]="{'p-2 text-neutral-300': isDrawerOpen, 'p-2 justify-center text-neutral-400': !isDrawerOpen}"
+               [title]="!isDrawerOpen ? link.label : ''">
+              <!-- Icon -->
+              <svg xmlns="http://www.w3.org/2000/svg"
+                   class="flex-shrink-0 transition duration-75 group-hover:text-white"
+                   [ngClass]="{'w-5 h-5': true}"
+                   fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" [attr.d]="getIconPath(link.icon)"></path>
+              </svg>
+
+              <!-- Label - only visible when expanded -->
+              <span *ngIf="isDrawerOpen" class="ms-3 flex-1 whitespace-nowrap">{{link.label}}</span>
+
+              <!-- Badge -->
+              @if (link.badge) {
+                <span class="inline-flex items-center justify-center rounded-full text-xs font-medium"
+                      [ngClass]="{
+                        'ms-3 px-2 py-0.5': isDrawerOpen,
+                        'absolute -top-1 -right-1 w-5 h-5': !isDrawerOpen,
+                        'bg-primary text-white': link.badge.type === 'green',
+                        'bg-info text-white': link.badge.type === 'blue'
+                      }">
+                  {{link.badge.text}}
+                </span>
+              }
+            </a>
+          </li>
+        }
+      </ul>
+    }
+  </div>
+
+  <!-- Help Center - always visible but styled differently based on state -->
+  <div class="p-3 border-t border-neutral-700 dark:border-dark-border mt-auto">
+    <a routerLink="/help"
+       class="flex items-center rounded-md hover:bg-neutral-700 transition-colors duration-150 group p-2"
+       [ngClass]="{'text-neutral-300': isDrawerOpen, 'text-neutral-400 justify-center': !isDrawerOpen}"
+       title="Help Center">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 group-hover:text-white transition duration-150" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+      <span *ngIf="isDrawerOpen" class="ml-3">Help Center</span>
+    </a>
+  </div>
+</div>
+
+<!-- Main content adjustment -->
+<div class="transition-all duration-300"
+     [ngClass]="{'pl-64': isDrawerOpen, 'pl-16': !isDrawerOpen}">
+  <!-- Your main content here -->
+</div>

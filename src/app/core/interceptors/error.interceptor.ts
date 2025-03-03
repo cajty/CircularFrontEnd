@@ -12,7 +12,7 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
         ? error.error.message
         : getServerErrorMessage(error);
 
-      // Show toast notification
+
       toastrService.error(errorMessage, 'Error');
 
       console.error(errorMessage);
