@@ -1,0 +1,551 @@
+<div class="container mx-auto px-4 py-6">
+  <!-- Page Header -->
+  <div class="mb-6">
+    <h1 class="text-2xl font-bold text-neutral-900 dark:text-dark-text">Material Categories</h1>
+    <p class="text-neutral-600 dark:text-dark-text text-sm mt-1">Manage categories for all materials in the circular marketplace</p>
+  </div>
+
+  <!-- Alert for notifications -->
+  <div *ngIf="notification"
+    [ngClass]="{'alert-success': notification.type === 'success',
+                'alert-error': notification.type === 'error'}"
+    class="mb-6 animate-fade-in">
+    <div class="flex items-center">
+      <svg *ngIf="notification.type === 'success'" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+      </svg>
+      <svg *ngIf="notification.type === 'error'" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+      <span>{{ notification.message }}</span>
+    </div>
+    <button (click)="clearNotification()" class="absolute top-2 right-2 text-current opacity-70 hover:opacity-100">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+      </svg>
+    </button>
+  </div>
+
+  <div class="flex flex-col lg:flex-row gap-6">
+    <!-- Category Form Panel -->
+    <div class="w-full lg:w-1/3">
+      <div class="card transition-all duration-300 animate-fade-in" [ngClass]="{'border-green-500': isEditing}">
+        <div class="flex justify-between items-center mb-6">
+          <h2 class="text-xl font-semibold" [ngClass]="{'text-green-500': isEditing}">
+            {{ isEditing ? 'Edit Category' : 'Add New Category' }}
+          </h2>
+
+          <div *ngIf="isEditing" class="badge-blue">
+            Editing
+          </div>
+        </div>
+
+        <form [formGroup]="categoryForm" (ngSubmit)="onSubmit()" class="space-y-5">
+          <!-- Category Name -->
+          <div class="form-group">
+            <label for="name" class="form-label">
+              Category Name <span class="text-red-500">*</span>
+            </label>
+            <div class="relative">
+              <input
+                type="text"
+                id="name"
+                formControlName="name"
+                class="form-input pl-9"
+                [ngClass]="{'border-red-500 ring-1 ring-red-500': categoryForm.get('name')?.invalid && categoryForm.get('name')?.touched,
+                           'border-green-500 ring-1 ring-green-500': categoryForm.get('name')?.valid && categoryForm.get('name')?.touched}"
+                placeholder="Enter category name">
+              <span class="absolute left-3 top-2.5 text-neutral-500">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+                </svg>
+              </span>
+            </div>
+            <div *ngIf="categoryForm.get('name')?.invalid && categoryForm.get('name')?.touched" class="form-error mt-1 animate-fade-in">
+              <span *ngIf="categoryForm.get('name')?.hasError('required')">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+                Name is required
+              </span>
+              <span *ngIf="categoryForm.get('name')?.hasError('minlength')">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+                Name must be at least 3 characters
+              </span>
+            </div>
+          </div>
+
+          <!-- Description -->
+          <div class="form-group">
+            <label for="description" class="form-label">Description</label>
+            <div class="relative">
+              <textarea
+                id="description"
+                formControlName="description"
+                rows="3"
+                class="form-input pl-9"
+                placeholder="Describe this category (optional)"></textarea>
+              <span class="absolute left-3 top-2.5 text-neutral-500">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7" />
+                </svg>
+              </span>
+            </div>
+          </div>
+
+          <!-- Active Status Toggle -->
+          <div class="flex items-center my-4">
+            <div class="relative inline-block w-10 mr-2 align-middle select-none transition duration-200 ease-in">
+              <input
+                type="checkbox"
+                id="isActive"
+                formControlName="isActive"
+                class="focus:ring-0 focus:ring-offset-0 toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer"
+                [ngClass]="{'right-0 border-green-500': categoryForm.get('isActive')?.value, 'border-neutral-300': !categoryForm.get('isActive')?.value}"
+              />
+              <label
+                for="isActive"
+                class="toggle-label block overflow-hidden h-6 rounded-full bg-neutral-300 dark:bg-neutral-700 cursor-pointer"
+                [ngClass]="{'bg-green-100': categoryForm.get('isActive')?.value}"
+              ></label>
+            </div>
+            <label for="isActive" class="text-sm font-medium ml-1">
+              {{ categoryForm.get('isActive')?.value ? 'Active' : 'Inactive' }} Status
+            </label>
+          </div>
+
+          <!-- Form Actions -->
+          <div class="flex space-x-3 pt-2">
+            <button
+              type="submit"
+              class="btn-primary flex items-center justify-center"
+              [disabled]="isLoading || categoryForm.invalid">
+              <svg *ngIf="isLoading" class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              <svg *ngIf="!isLoading" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path *ngIf="!isEditing" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                <path *ngIf="isEditing" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+              </svg>
+              {{ isEditing ? 'Update' : 'Create' }} Category
+            </button>
+
+            <button
+              type="button"
+              *ngIf="isEditing"
+              class="btn-outline flex items-center justify-center"
+              (click)="resetForm()"
+              [disabled]="isLoading">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+              Cancel
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Categories List Panel -->
+    <div class="w-full lg:w-2/3">
+      <div class="card">
+        <div class="flex flex-col md:flex-row justify-between md:items-center mb-6">
+          <h2 class="text-xl font-semibold mb-2 md:mb-0">Categories</h2>
+
+          <!-- Search and Filter Controls -->
+          <div class="flex flex-col md:flex-row gap-3">
+            <!-- Search Input -->
+            <div class="relative">
+              <input
+                type="text"
+                placeholder="Search categories..."
+                class="form-input pl-9 pr-4 py-2 w-full md:w-64"
+                [(ngModel)]="searchTerm"
+                (input)="onSearch()"
+              >
+              <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-neutral-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+              </div>
+              <button
+                *ngIf="searchTerm"
+                class="absolute inset-y-0 right-0 pr-3 flex items-center text-neutral-400 hover:text-neutral-600"
+                (click)="clearSearch()">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            <!-- Status Filter -->
+            <select
+              class="form-input py-2"
+              [(ngModel)]="statusFilter"
+              (change)="applyFilters()">
+              <option value="all">All Statuses</option>
+              <option value="active">Active Only</option>
+              <option value="inactive">Inactive Only</option>
+            </select>
+
+            <!-- Sort Order -->
+            <div class="relative">
+              <select
+                class="form-input py-2 pl-9 pr-8 appearance-none"
+                [(ngModel)]="sortOrder"
+                (change)="applyFilters()">
+                <option value="name,asc">Name (A-Z)</option>
+                <option value="name,desc">Name (Z-A)</option>
+                <option value="createdAt,desc">Newest First</option>
+                <option value="createdAt,asc">Oldest First</option>
+              </select>
+              <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-neutral-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12" />
+                </svg>
+              </div>
+              <div class="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
+                <svg class="w-4 h-4 text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                </svg>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Loading Skeleton -->
+        <div *ngIf="isLoading" class="animate-pulse">
+          <div class="h-12 bg-neutral-200 dark:bg-dark-surface rounded-md mb-3"></div>
+          <div class="h-12 bg-neutral-200 dark:bg-dark-surface rounded-md mb-3"></div>
+          <div class="h-12 bg-neutral-200 dark:bg-dark-surface rounded-md mb-3"></div>
+          <div class="h-12 bg-neutral-200 dark:bg-dark-surface rounded-md"></div>
+        </div>
+
+        <!-- Empty State -->
+        <div *ngIf="categories.length === 0 && !isLoading" class="py-12 text-center">
+          <div class="mx-auto w-24 h-24 bg-neutral-100 dark:bg-dark-surface rounded-full flex items-center justify-center mb-4">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-neutral-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+            </svg>
+          </div>
+          <h3 class="text-lg font-medium text-neutral-900 dark:text-dark-text mb-1">No categories found</h3>
+          <p class="text-neutral-600 dark:text-neutral-400 mb-6">Get started by creating your first category</p>
+          <button (click)="focusAddForm()" class="btn-primary inline-flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+            </svg>
+            Add Category
+          </button>
+        </div>
+
+        <!-- Categories Table -->
+        <div class="table-container overflow-x-auto" *ngIf="categories.length > 0 && !isLoading">
+          <table class="table w-full">
+            <thead>
+              <tr>
+                <th class="w-1/3">Name</th>
+                <th class="w-1/6">Status</th>
+                <th class="w-1/3">Created</th>
+                <th class="w-1/6">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let category of categories" class="transition-all hover:shadow-sm animate-fade-in">
+                <td class="font-medium">{{ category.name }}</td>
+                <td>
+                  <div class="flex justify-center">
+                    <span
+                      [ngClass]="category.isActive ? 'badge-green' : 'badge-gray'"
+                      class="animate-fade-in">
+                      {{ category.isActive ? 'Active' : 'Inactive' }}
+                    </span>
+                  </div>
+                </td>
+                <td>
+                  <div class="flex flex-col">
+                    <span class="font-medium">{{ category.createdAt | date:'MMM d, yyyy' }}</span>
+                    <span class="text-xs text-neutral-500">{{ category.createdAt | date:'h:mm a' }}</span>
+                  </div>
+                </td>
+                <td>
+                  <div class="flex justify-center space-x-1">
+                    <!-- View Button -->
+                    <button
+                      (click)="viewCategoryDetails(category.id)"
+                      class="p-1.5 rounded-full text-info hover:bg-info hover:bg-opacity-10 transition-colors"
+                      title="View Details">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                      </svg>
+                    </button>
+
+                    <!-- Edit Button -->
+                    <button
+                      (click)="editCategory(category)"
+                      class="p-1.5 rounded-full text-info hover:bg-info hover:bg-opacity-10 transition-colors"
+                      title="Edit Category">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                      </svg>
+                    </button>
+
+                    <!-- Toggle Status Button -->
+                    <button
+                      (click)="toggleCategoryStatus(category)"
+                      [title]="category.isActive ? 'Deactivate' : 'Activate'"
+                      class="p-1.5 rounded-full text-warning hover:bg-warning hover:bg-opacity-10 transition-colors">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path *ngIf="category.isActive" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
+                        <path *ngIf="!category.isActive" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                    </button>
+
+                    <!-- Delete Button -->
+                    <button
+                      (click)="confirmDelete(category)"
+                      class="p-1.5 rounded-full text-error hover:bg-error hover:bg-opacity-10 transition-colors"
+                      title="Delete Category">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                      </svg>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Enhanced Pagination -->
+        <div *ngIf="totalPages > 0 && !isLoading" class="mt-6 flex flex-col md:flex-row justify-between items-center text-sm text-neutral-600 dark:text-neutral-400">
+          <div class="mb-4 md:mb-0">
+            <span>Showing </span>
+            <select
+              [(ngModel)]="pageSize"
+              (change)="onPageSizeChange()"
+              class="mx-1 bg-white dark:bg-dark-surface border border-neutral-300 dark:border-dark-border rounded-md text-sm px-2 py-1 focus:outline-none focus:ring-1 focus:ring-green-500">
+              <option [value]="5">5</option>
+              <option [value]="10">10</option>
+              <option [value]="25">25</option>
+              <option [value]="50">50</option>
+            </select>
+            <span>of {{ totalItems }} categories</span>
+          </div>
+
+          <div class="flex items-center space-x-1">
+            <button
+              (click)="changePage(0)"
+              [disabled]="currentPage === 0"
+              [ngClass]="{'opacity-50 cursor-not-allowed': currentPage === 0}"
+              class="flex items-center justify-center w-8 h-8 rounded-md border border-neutral-300 dark:border-dark-border bg-white dark:bg-dark-surface hover:bg-neutral-100 dark:hover:bg-neutral-700 transition-colors">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
+              </svg>
+            </button>
+
+            <button
+              (click)="changePage(currentPage - 1)"
+              [disabled]="currentPage === 0"
+              [ngClass]="{'opacity-50 cursor-not-allowed': currentPage === 0}"
+              class="flex items-center justify-center w-8 h-8 rounded-md border border-neutral-300 dark:border-dark-border bg-white dark:bg-dark-surface hover:bg-neutral-100 dark:hover:bg-neutral-700 transition-colors">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+              </svg>
+            </button>
+
+            <!-- Page Numbers -->
+            <div class="flex space-x-1">
+              <ng-container *ngFor="let page of getPageNumbers()">
+                <button
+                  *ngIf="page !== null"
+                  (click)="changePage(page)"
+                  [ngClass]="{'bg-green-500 text-white font-medium': currentPage === page, 'bg-white dark:bg-dark-surface text-neutral-700 dark:text-dark-text': currentPage !== page}"
+                  class="flex items-center justify-center w-8 h-8 rounded-md border border-neutral-300 dark:border-dark-border hover:bg-neutral-100 dark:hover:bg-neutral-700 transition-colors">
+                  {{ page + 1 }}
+                </button>
+                <span
+                  *ngIf="page === null"
+                  class="flex items-center justify-center w-8 h-8 text-neutral-500">
+                  ...
+                </span>
+              </ng-container>
+            </div>
+
+            <button
+              (click)="changePage(currentPage + 1)"
+              [disabled]="currentPage === totalPages - 1"
+              [ngClass]="{'opacity-50 cursor-not-allowed': currentPage === totalPages - 1}"
+              class="flex items-center justify-center w-8 h-8 rounded-md border border-neutral-300 dark:border-dark-border bg-white dark:bg-dark-surface hover:bg-neutral-100 dark:hover:bg-neutral-700 transition-colors">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
+
+            <button
+              (click)="changePage(totalPages - 1)"
+              [disabled]="currentPage === totalPages - 1"
+              [ngClass]="{'opacity-50 cursor-not-allowed': currentPage === totalPages - 1}"
+              class="flex items-center justify-center w-8 h-8 rounded-md border border-neutral-300 dark:border-dark-border bg-white dark:bg-dark-surface hover:bg-neutral-100 dark:hover:bg-neutral-700 transition-colors">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M5 5l7 7-7 7" />
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Delete Confirmation Modal -->
+  <div *ngIf="categoryToDelete" class="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+    <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+      <!-- Background overlay -->
+      <div class="fixed inset-0 bg-neutral-900 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
+
+      <!-- Modal panel -->
+      <div class="inline-block align-bottom bg-white dark:bg-dark-surface rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+        <div class="bg-white dark:bg-dark-surface px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+          <div class="sm:flex sm:items-start">
+            <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
+              <svg class="h-6 w-6 text-error" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+            </div>
+            <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+              <h3 class="text-lg leading-6 font-medium text-neutral-900 dark:text-dark-text" id="modal-title">
+                Delete Category
+              </h3>
+              <div class="mt-2">
+                <p class="text-sm text-neutral-600 dark:text-neutral-300">
+                  Are you sure you want to delete the category "{{ categoryToDelete.name }}"? This action cannot be undone,
+                  and it may affect materials currently using this category.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="bg-neutral-50 dark:bg-dark-surface px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse border-t border-neutral-200 dark:border-dark-border">
+          <button
+            type="button"
+            (click)="deleteCategory()"
+            class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-error text-base font-medium text-white hover:bg-error-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-error sm:ml-3 sm:w-auto sm:text-sm"
+            [disabled]="isDeleting">
+            <svg *ngIf="isDeleting" class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            {{ isDeleting ? 'Deleting...' : 'Delete' }}
+          </button>
+          <button
+            type="button"
+            (click)="cancelDelete()"
+            class="mt-3 w-full inline-flex justify-center rounded-md border border-neutral-300 dark:border-dark-border shadow-sm px-4 py-2 bg-white dark:bg-dark-surface text-base font-medium text-neutral-700 dark:text-dark-text hover:bg-neutral-50 dark:hover:bg-neutral-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+            Cancel
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Category Details Modal -->
+  <div *ngIf="selectedCategory" class="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+    <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+      <!-- Background overlay -->
+      <div class="fixed inset-0 bg-neutral-900 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
+
+      <!-- Modal panel -->
+      <div class="inline-block align-bottom bg-white dark:bg-dark-surface rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+        <div class="bg-white dark:bg-dark-surface px-4 pt-5 pb-4 sm:p-6">
+          <div class="flex justify-between items-start">
+            <h3 class="text-lg leading-6 font-medium text-neutral-900 dark:text-dark-text" id="modal-title">
+              Category Details
+            </h3>
+            <button
+              (click)="closeDetails()"
+              class="bg-white dark:bg-dark-surface rounded-md text-neutral-400 hover:text-neutral-600 focus:outline-none">
+              <span class="sr-only">Close</span>
+              <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+
+          <div class="mt-4">
+            <div class="bg-neutral-50 dark:bg-neutral-800 p-4 rounded-md border border-neutral-200 dark:border-dark-border mb-4">
+              <div class="flex items-center justify-between mb-2">
+                <h4 class="font-semibold text-neutral-900 dark:text-dark-text">{{ selectedCategory.name }}</h4>
+                <span
+                  [ngClass]="selectedCategory.isActive ? 'badge-green' : 'badge-gray'">
+                  {{ selectedCategory.isActive ? 'Active' : 'Inactive' }}
+                </span>
+              </div>
+
+              <p class="text-sm text-neutral-600 dark:text-neutral-300 mb-2">
+                {{ selectedCategory.description || 'No description provided' }}
+              </p>
+
+              <div class="text-xs text-neutral-500 dark:text-neutral-400">
+                <p>Created: {{ selectedCategory.createdAt | date:'medium' }}</p>
+                <p>ID: {{ selectedCategory.id }}</p>
+              </div>
+            </div>
+
+            <div *ngIf="categoryStats" class="mt-4">
+              <h4 class="font-medium text-neutral-900 dark:text-dark-text mb-2">Category Statistics</h4>
+              <div class="grid grid-cols-2 gap-3">
+                <div class="bg-neutral-50 dark:bg-neutral-800 p-3 rounded-md border border-neutral-200 dark:border-dark-border">
+                  <div class="text-xs text-neutral-500 dark:text-neutral-400">Total Materials</div>
+                  <div class="text-lg font-semibold text-neutral-900 dark:text-dark-text">{{ categoryStats.materialCount }}</div>
+                </div>
+                <div class="bg-neutral-50 dark:bg-neutral-800 p-3 rounded-md border border-neutral-200 dark:border-dark-border">
+                  <div class="text-xs text-neutral-500 dark:text-neutral-400">Active Materials</div>
+                  <div class="text-lg font-semibold text-neutral-900 dark:text-dark-text">{{ categoryStats.activeMaterials }}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="bg-neutral-50 dark:bg-dark-surface px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse border-t border-neutral-200 dark:border-dark-border">
+          <button
+            type="button"
+            (click)="editCategory(selectedCategory); closeDetails()"
+            class="ml-3 inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-green-500 text-base font-medium text-white hover:bg-opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 sm:ml-3 sm:w-auto sm:text-sm">
+            Edit Category
+          </button>
+          <button
+            type="button"
+            (click)="closeDetails()"
+            class="mt-3 inline-flex justify-center rounded-md border border-neutral-300 dark:border-dark-border shadow-sm px-4 py-2 bg-white dark:bg-dark-surface text-base font-medium text-neutral-700 dark:text-dark-text hover:bg-neutral-50 dark:hover:bg-neutral-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 sm:mt-0 sm:w-auto sm:text-sm">
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CSS Animations -->
+<style>
+  @keyframes fade-in {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .animate-fade-in {
+    animation: fade-in 0.3s ease-out forwards;
+  }
+
+  /* Toggle Switch Styles */
+  .toggle-checkbox:checked {
+    right: 0;
+    border-color: #1ba94c;
+  }
+
+  .toggle-checkbox:checked + .toggle-label {
+    background-color: #c8e6c9;
+  }
+</style>
