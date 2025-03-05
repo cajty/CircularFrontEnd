@@ -56,7 +56,7 @@
   }
 
   .btn-danger {
-    @apply btn bg-error text-white hover:bg-opacity-90 hover:bg-error-dark;
+    @apply btn bg-error text-white hover:bg-opacity-90 hover:bg-error;
   }
 
   .btn-small {

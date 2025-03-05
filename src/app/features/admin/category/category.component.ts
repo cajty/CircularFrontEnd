@@ -64,7 +64,7 @@ export class CategoryComponent implements OnInit {
       isActive: [true]
     });
 
-    // Setup search debounce
+
     this.searchSubject.pipe(
       debounceTime(300),
       distinctUntilChanged()
@@ -77,9 +77,7 @@ export class CategoryComponent implements OnInit {
     this.loadCategories();
   }
 
-  /**
-   * Load categories with pagination, sorting and filtering
-   */
+
   loadCategories(page: number = 0): void {
     this.isLoading = true;
 
@@ -124,9 +122,7 @@ export class CategoryComponent implements OnInit {
     });
   }
 
-  /**
-   * Handle form submission for creating or updating a category
-   */
+
   onSubmit(): void {
     if (this.categoryForm.invalid) {
       this.markFormGroupTouched(this.categoryForm);
@@ -163,9 +159,7 @@ export class CategoryComponent implements OnInit {
     }
   }
 
-  /**
-   * Set up form for editing a category
-   */
+
   editCategory(category: CategoryResponse): void {
     this.isEditing = true;
     this.editingCategoryId = category.id;
@@ -175,28 +169,22 @@ export class CategoryComponent implements OnInit {
       isActive: category.isActive
     });
 
-    // Focus the form when editing
+
     this.focusAddForm();
   }
 
-  /**
-   * Confirm before deleting a category
-   */
+
   confirmDelete(category: CategoryResponse): void {
     this.categoryToDelete = category;
   }
 
-  /**
-   * Cancel the delete operation
-   */
+
   cancelDelete(): void {
     this.categoryToDelete = null;
     this.isDeleting = false;
   }
 
-  /**
-   * Delete a category after confirmation
-   */
+
   deleteCategory(): void {
     if (!this.categoryToDelete) return;
 
@@ -216,9 +204,7 @@ export class CategoryComponent implements OnInit {
     });
   }
 
-  /**
-   * Toggle the active status of a category
-   */
+
   toggleCategoryStatus(category: CategoryResponse): void {
     this.isLoading = true;
 
@@ -235,9 +221,7 @@ export class CategoryComponent implements OnInit {
     });
   }
 
-  /**
-   * View category details and load statistics
-   */
+
   viewCategoryDetails(categoryId: number): void {
     this.isLoading = true;
 
@@ -245,7 +229,7 @@ export class CategoryComponent implements OnInit {
       next: (category) => {
         this.selectedCategory = category;
 
-        // Mock category stats since we don't have a real endpoint for this
+
         this.categoryStats = {
           materialCount: Math.floor(Math.random() * 50),
           activeMaterials: Math.floor(Math.random() * 30)
@@ -260,26 +244,20 @@ export class CategoryComponent implements OnInit {
     });
   }
 
-  /**
-   * Close the category details modal
-   */
+
   closeDetails(): void {
     this.selectedCategory = null;
     this.categoryStats = null;
   }
 
-  /**
-   * Reset the form to its initial state
-   */
+
   resetForm(): void {
     this.categoryForm.reset({ isActive: true });
     this.isEditing = false;
     this.editingCategoryId = null;
   }
 
-  /**
-   * Change page in pagination
-   */
+
   changePage(page: number): void {
     if (page >= 0 && page < this.totalPages) {
       this.currentPage = page;
@@ -287,40 +265,30 @@ export class CategoryComponent implements OnInit {
     }
   }
 
-  /**
-   * Handle page size change
-   */
+
   onPageSizeChange(): void {
     this.currentPage = 0; // Reset to first page
     this.loadCategories(0);
   }
 
-  /**
-   * Search for categories
-   */
+
   onSearch(): void {
     this.searchSubject.next(this.searchTerm);
   }
 
-  /**
-   * Clear search input
-   */
+
   clearSearch(): void {
     this.searchTerm = '';
     this.applyFilters();
   }
 
-  /**
-   * Apply filters and sorting
-   */
+
   applyFilters(): void {
     this.currentPage = 0; // Reset to first page
     this.loadCategories(0);
   }
 
-  /**
-   * Focus the category name input field
-   */
+
   focusAddForm(): void {
     setTimeout(() => {
       if (this.nameInput) {
@@ -329,44 +297,42 @@ export class CategoryComponent implements OnInit {
     }, 100);
   }
 
-  /**
-   * Get page numbers for pagination
-   */
+
   getPageNumbers(): (number | null)[] {
     const pages: (number | null)[] = [];
     const maxPagesToShow = 5;
 
     if (this.totalPages <= maxPagesToShow) {
-      // Show all pages
+
       for (let i = 0; i < this.totalPages; i++) {
         pages.push(i);
       }
     } else {
-      // Always include first page
+
       pages.push(0);
 
       if (this.currentPage > 1) {
-        // Add ellipsis if current page is far from first
+
         if (this.currentPage > 2) {
-          pages.push(null); // null represents ellipsis
+          pages.push(null);
         }
 
-        // Show one page before current
+
         pages.push(this.currentPage - 1);
       }
 
-      // Current page
+
       if (this.currentPage !== 0 && this.currentPage !== this.totalPages - 1) {
         pages.push(this.currentPage);
       }
 
       if (this.currentPage < this.totalPages - 2) {
-        // Show one page after current
+
         pages.push(this.currentPage + 1);
 
-        // Add ellipsis if current page is far from last
+
         if (this.currentPage < this.totalPages - 3) {
-          pages.push(null); // null represents ellipsis
+          pages.push(null);
         }
       }
 
@@ -377,28 +343,23 @@ export class CategoryComponent implements OnInit {
     return pages;
   }
 
-  /**
-   * Show notification to user
-   */
+
   showNotification(type: 'success' | 'error', message: string): void {
     this.notification = { type, message };
 
-    // Also use toast service
     if (type === 'success') {
       this.toastService.success(message);
     } else {
       this.toastService.error(message);
     }
 
-    // Auto-hide notification after 5 seconds
+
     setTimeout(() => {
       this.clearNotification();
     }, 5000);
   }
 
-  /**
-   * Clear notification
-   */
+
   clearNotification(): void {
     this.notification = null;
   }
