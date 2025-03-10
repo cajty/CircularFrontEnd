@@ -5,7 +5,6 @@ import { environment } from '../../../environments/environment';
 import {
   VerificationDocumentRequest,
   VerificationDocumentResponse,
-  VerificationStatusUpdateRequest
 } from '../../models/enterprise-verification';
 
 
@@ -30,9 +29,7 @@ export class EnterpriseVerificationService {
   }
 
 
-  updateVerificationStatus(request: VerificationStatusUpdateRequest): Observable<void> {
-    return this.http.post<void>(`${this.apiUrl}/status`, request);
-  }
+
 
 
   getDocuments(enterpriseId: number): Observable<VerificationDocumentResponse[]> {

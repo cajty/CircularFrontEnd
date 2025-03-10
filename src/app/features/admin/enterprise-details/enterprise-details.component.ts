@@ -160,7 +160,7 @@ export class EnterpriseDetailsComponent implements OnInit {
     this.isUpdatingStatus = true;
     this.statusUpdateRequest.enterpriseId = this.enterpriseId;
 
-    this.verificationService.updateVerificationStatus(this.statusUpdateRequest)
+    this.enterpriseService.updateVerificationStatus(this.statusUpdateRequest)
       .subscribe({
         next: () => {
           this.toastService.success(`Verification status updated to ${this.statusUpdateRequest.newStatus}`);

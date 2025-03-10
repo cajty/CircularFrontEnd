@@ -5,6 +5,7 @@ import { Observable } from 'rxjs';
 
 import { environment } from '../../../environments/environment';
 import { EnterpriseRequest, EnterpriseResponse } from '../../models/enterprise';
+import {VerificationStatusUpdateRequest} from '../../models/enterprise-verification';
 
 @Injectable({
   providedIn: 'root'
@@ -34,6 +35,7 @@ export class EnterpriseService {
   }
 
 
+
   getAll(page: number = 0, size: number = 10, sort?: string): Observable<any> {
     let params = new HttpParams()
       .set('page', page.toString())
@@ -44,5 +46,9 @@ export class EnterpriseService {
     }
 
     return this.http.get<any>(this.apiUrl, { params });
+  }
+
+   updateVerificationStatus(request: VerificationStatusUpdateRequest): Observable<void> {
+    return this.http.post<void>(`${this.apiUrl}/status`, request);
   }
 }
