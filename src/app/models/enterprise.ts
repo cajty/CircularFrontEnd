@@ -1,11 +1,9 @@
-import {LocationRequest} from './location';
-
 export interface EnterpriseRequest {
   name: string;
   registrationNumber: string;
-  type: EnterpriseType;
-  locationRequest: LocationRequest;
+  enterpriseType: EnterpriseType;
 }
+
 
 export interface EnterpriseResponse {
   id: number;
@@ -14,9 +12,8 @@ export interface EnterpriseResponse {
   type: EnterpriseType;
   status: VerificationStatus;
   verifiedAt?: Date;
-  // locations?: LocationDto[];
-  // users?: UserDto[];
 }
+
 
 export enum EnterpriseType {
   RECYCLER = "RECYCLER",
@@ -24,10 +21,10 @@ export enum EnterpriseType {
   PROCESSOR = "PROCESSOR"
 }
 
+
 export enum VerificationStatus {
-  PENDING= "PENDING",
+  PENDING = "PENDING",
+  UNDER_REVIEW = "UNDER_REVIEW",
   VERIFIED = "VERIFIED",
   REJECTED = "REJECTED"
 }
-
-

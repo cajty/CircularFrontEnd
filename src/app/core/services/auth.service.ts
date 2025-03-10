@@ -43,16 +43,15 @@ export class AuthService {
 
   private apiUrl = `${environment.apiUrl}/auth`;
   private readonly AUTH_TOKEN = 'auth-token';
-  // BehaviorSubject to track authentication state
+
   private currentUserSubject = new BehaviorSubject<AuthUser | null>(null);
   public currentUser$ = this.currentUserSubject.asObservable();
 
-  // BehaviorSubject to track whether the user is logged in
+
   private isAuthenticatedSubject = new BehaviorSubject<boolean>(false);
   public isAuthenticated$ = this.isAuthenticatedSubject.asObservable();
 
   constructor() {
-    // Check if user is already logged in from localStorage
     this.loadUserFromStorage();
   }
 

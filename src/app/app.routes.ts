@@ -19,6 +19,18 @@ export const routes: Routes = [
         loadComponent: () => import('./features/auth/login/login.component').then(m => m.LoginComponent),
         title: 'Login'
       },
+   {
+    path: 'admin/enterprises',
+    loadComponent: () => import('./features/admin/enterprise-list/enterprise-list.component').then(m => m.EnterpriseListComponent),
+    title: 'Enterprise List',
+    canActivate: [authGuard]
+  },
+  {
+    path: 'admin/enterprises/:id',
+    loadComponent: () => import('./features/admin/enterprise-details/enterprise-details.component').then(m => m.EnterpriseDetailsComponent),
+    title: 'Enterprise Details',
+    canActivate: [authGuard]
+  },
 
   { path: '', redirectTo: '/Login', pathMatch: 'full' }
 ];
