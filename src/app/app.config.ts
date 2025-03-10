@@ -4,6 +4,7 @@ import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { provideToastr } from 'ngx-toastr';
 import { routes } from './app.routes';
 import {errorInterceptor} from './core/interceptors/error.interceptor';
+import {authInterceptor} from './core/interceptors/auth.interceptor';
 
 
 export const appConfig: ApplicationConfig = {
@@ -11,7 +12,7 @@ export const appConfig: ApplicationConfig = {
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes),
     provideHttpClient(
-      withInterceptors([errorInterceptor])
+      withInterceptors([errorInterceptor,authInterceptor])
     ),
     provideToastr({
       timeOut: 5000,

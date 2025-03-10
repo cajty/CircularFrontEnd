@@ -4,7 +4,7 @@ import { ToastrService } from 'ngx-toastr';
 import { catchError, throwError } from 'rxjs';
 
 export const errorInterceptor: HttpInterceptorFn = (req, next) => {
-  const toastrService = inject(ToastrService);
+  const toastService = inject(ToastrService);
 
   return next(req).pipe(
     catchError((error: HttpErrorResponse) => {
@@ -13,7 +13,7 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
         : getServerErrorMessage(error);
 
 
-      toastrService.error(errorMessage, 'Error');
+      toastService.error(errorMessage, 'Error');
 
       console.error(errorMessage);
       return throwError(() => new Error(errorMessage));
