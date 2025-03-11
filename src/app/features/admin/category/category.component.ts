@@ -2,8 +2,8 @@ import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
-import { CategoryService } from '../../../core/services/category.service';
-import { ToastService } from '../../../core/services/toast.service';
+import { CategoryService } from '../../../core/services/category/category.service';
+import { ToastService } from '../../../core/services/toast/toast.service';
 import { CategoryRequest, CategoryResponse } from '../../../models/materialCategory';
 
 interface Notification {

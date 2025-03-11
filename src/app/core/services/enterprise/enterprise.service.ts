@@ -1,11 +1,10 @@
-// src/app/core/services/enterprise.service.ts
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
-import { environment } from '../../../environments/environment';
-import { EnterpriseRequest, EnterpriseResponse } from '../../models/enterprise';
-import {VerificationStatusUpdateRequest} from '../../models/enterprise-verification';
+import { environment } from '../../../../environments/environment';
+import { EnterpriseRequest, EnterpriseResponse } from '../../../models/enterprise';
+import {VerificationStatusUpdateRequest} from '../../../models/enterprise-verification';
 
 @Injectable({
   providedIn: 'root'

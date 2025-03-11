@@ -3,9 +3,9 @@ import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 
 import { EnterpriseVerificationService } from './enterprise-verification.service';
-import { environment } from '../../../environments/environment';
-import { VerificationStatus } from '../../models/enterprise';
-import {VerificationDocumentResponse, VerificationStatusUpdateRequest} from '../../models/enterprise-verification';
+import { environment } from '../../../../environments/environment';
+import { VerificationStatus } from '../../../models/enterprise';
+import {VerificationDocumentResponse, VerificationStatusUpdateRequest} from '../../../models/enterprise-verification';
 
 
 describe('EnterpriseVerificationService', () => {

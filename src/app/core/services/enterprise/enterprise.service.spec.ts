@@ -3,8 +3,8 @@ import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 
 import { EnterpriseService } from './enterprise.service';
-import { environment } from '../../../environments/environment';
-import { EnterpriseRequest, EnterpriseResponse, EnterpriseType, VerificationStatus } from '../../models/enterprise';
+import { environment } from '../../../../environments/environment';
+import { EnterpriseRequest, EnterpriseResponse, EnterpriseType, VerificationStatus } from '../../../models/enterprise';
 
 describe('EnterpriseService', () => {
   let service: EnterpriseService;

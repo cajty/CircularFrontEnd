@@ -1,11 +1,10 @@
-// src/app/core/services/auth.service.ts
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable, throwError } from 'rxjs';
 import { catchError, map, tap } from 'rxjs/operators';
-import { environment } from '../../../environments/environment';
+import { environment } from '../../../../environments/environment';
 import { Router } from '@angular/router';
-import { ToastService } from './toast.service';
+import { ToastService } from '../toast/toast.service';
 
 
 export interface RegisterRequest {

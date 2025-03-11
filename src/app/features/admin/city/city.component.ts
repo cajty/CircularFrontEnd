@@ -2,8 +2,8 @@ import { Component, OnInit, OnDestroy, signal, computed, inject } from '@angular
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Subscription } from 'rxjs';
-import {CityService} from '../../../core/services/city.service';
-import {ToastService} from '../../../core/services/toast.service';
+import {CityService} from '../../../core/services/city/city.service';
+import {ToastService} from '../../../core/services/toast/toast.service';
 import {CityRequest, CityResponse} from '../../../models/city';
 
 

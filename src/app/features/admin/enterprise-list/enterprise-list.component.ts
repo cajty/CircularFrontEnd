@@ -3,8 +3,8 @@ import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 
-import { EnterpriseService } from '../../../core/services/enterprise.service';
-import { ToastService } from '../../../core/services/toast.service';
+import { EnterpriseService } from '../../../core/services/enterprise/enterprise.service';
+import { ToastService } from '../../../core/services/toast/toast.service';
 import { EnterpriseResponse, EnterpriseType, VerificationStatus } from '../../../models/enterprise';
 
 @Component({

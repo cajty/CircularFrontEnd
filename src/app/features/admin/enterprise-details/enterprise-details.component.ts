@@ -4,9 +4,9 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 
-import { EnterpriseService } from '../../../core/services/enterprise.service';
-import { EnterpriseVerificationService } from '../../../core/services/enterprise-verification.service';
-import { ToastService } from '../../../core/services/toast.service';
+import { EnterpriseService } from '../../../core/services/enterprise/enterprise.service';
+import { EnterpriseVerificationService } from '../../../core/services/enterprise-verification/enterprise-verification.service';
+import { ToastService } from '../../../core/services/toast/toast.service';
 import {
   EnterpriseRequest,
   EnterpriseResponse,

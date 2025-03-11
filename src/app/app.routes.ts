@@ -31,6 +31,18 @@ export const routes: Routes = [
     title: 'Enterprise Details',
     canActivate: [authGuard]
   },
+  {
+    path: 'locations',
+    loadComponent: () => import('./features/manager/location/location.component').then(m => m.LocationComponent),
+    title: 'Manage Locations',
+    canActivate: [authGuard]
+  },
+   {
+    path: 'materials',
+    loadComponent: () => import('./features/manager/material/material.component').then(m => m.MaterialComponent),
+    title: 'Manage Materials',
+    canActivate: [authGuard]
+  },
 
   { path: '', redirectTo: '/Login', pathMatch: 'full' }
 ];
