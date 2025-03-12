@@ -1,1 +1,164 @@
-<p>location works!</p>
+<div class="container mx-auto p-4">
+  <h1 class="mb-6">{{ editMode ? 'Edit' : 'Create' }} Location</h1>
+  <div *ngIf="successMessage" class="alert alert-success mb-4 flex justify-between items-center">
+    <span>{{ successMessage }}</span>
+    <button class="text-sm" (click)="dismissSuccess()">✕</button>
+  </div>
+
+  <div *ngIf="error" class="alert alert-error mb-4 flex justify-between items-center">
+    <span>{{ error }}</span>
+    <button class="text-sm" (click)="dismissError()">✕</button>
+  </div>
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <!-- Left Column: Form -->
+    <div class="md:col-span-3">
+      <div class="card">
+        <form [formGroup]="locationForm" (ngSubmit)="onSubmit()">
+          <!-- Address Input -->
+          <div class="mb-4">
+            <label for="address" class="form-label">Address</label>
+            <input
+              type="text"
+              id="address"
+              formControlName="address"
+              class="form-input"
+              [ngClass]="{'border-error': locationForm.get('address')?.invalid && locationForm.get('address')?.touched}"
+            >
+            <div *ngIf="locationForm.get('address')?.errors && locationForm.get('address')?.touched" class="form-error">
+              <span *ngIf="locationForm.get('address')?.errors?.['required']">Address is required</span>
+              <span *ngIf="locationForm.get('address')?.errors?.['minlength']">Address must be at least 5 characters</span>
+              <span *ngIf="locationForm.get('address')?.errors?.['maxlength']">Address cannot exceed 100 characters</span>
+            </div>
+          </div>
+
+          <!-- City Selection -->
+          <div class="mb-4">
+            <label class="form-label">City</label>
+            <app-city-list
+              [selectedCityId]="selectedCityId"
+              (citySelected)="onCitySelected($event)"
+            ></app-city-list>
+            <div *ngIf="locationForm.get('cityId')?.errors && locationForm.get('cityId')?.touched" class="form-error mt-2">
+              <span *ngIf="locationForm.get('cityId')?.errors?.['required']">Please select a city</span>
+            </div>
+          </div>
+
+          <!-- Location Type Dropdown -->
+          <div class="mb-4">
+            <label for="type" class="form-label">Location Type</label>
+            <select
+              id="type"
+              formControlName="type"
+              class="form-input"
+              [ngClass]="{'border-error': locationForm.get('type')?.invalid && locationForm.get('type')?.touched}"
+            >
+              <option *ngFor="let type of locationTypes" [value]="type">
+                {{ type.replace('_', ' ') }}
+              </option>
+            </select>
+            <div *ngIf="locationForm.get('type')?.errors && locationForm.get('type')?.touched" class="form-error">
+              <span *ngIf="locationForm.get('type')?.errors?.['required']">Location type is required</span>
+            </div>
+          </div>
+
+          <!-- Active Status -->
+          <div class="mb-4">
+            <div class="flex items-center">
+              <input
+                type="checkbox"
+                id="isActive"
+                formControlName="isActive"
+                class="mr-2 h-5 w-5 text-primary focus:ring-primary"
+              >
+              <label for="isActive" class="form-label mb-0">Active Location</label>
+            </div>
+          </div>
+
+          <!-- Hidden field for Enterprise ID -->
+          <input type="hidden" formControlName="enterpriseId">
+
+          <!-- Hidden field for City ID -->
+          <input type="hidden" formControlName="cityId">
+
+          <!-- Form Actions -->
+          <div class="flex justify-between mt-6">
+            <button
+              type="button"
+              class="btn-secondary"
+              (click)="resetForm()"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              class="btn-primary"
+              [disabled]="submitting || locationForm.invalid"
+            >
+              <span *ngIf="submitting" class="inline-block mr-2">
+                <span class="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white"></span>
+              </span>
+              {{ editMode ? 'Update' : 'Create' }} Location
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Location List -->
+      <div class="card mt-6">
+        <h2 class="mb-4">Locations</h2>
+
+        <div *ngIf="loading" class="flex justify-center items-center p-4">
+          <div class="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary"></div>
+        </div>
+
+        <div *ngIf="locations.length === 0 && !loading" class="p-4 text-center text-neutral-600">
+          No locations available
+        </div>
+
+        <div *ngIf="locations.length > 0" class="table-container">
+          <table class="table w-full">
+            <thead>
+              <tr>
+                <th>Address</th>
+                <th>City</th>
+                <th>Type</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let location of locations">
+                <td>{{ location.address }}</td>
+                <td>{{ location.cityName }}</td>
+                <td>{{ location.type.replace('_', ' ') }}</td>
+                <td>
+                  <span class="badge" [ngClass]="location.isActive ? 'badge-green' : 'badge-gray'">
+                    {{ location.isActive ? 'Active' : 'Inactive' }}
+                  </span>
+                </td>
+                <td>
+                  <div class="flex space-x-2">
+                    <button
+                      class="btn-small btn-secondary"
+                      (click)="loadLocationDetails(location.id)"
+                    >
+                      Edit
+                    </button>
+                    <button
+                      class="btn-small btn-danger"
+                      (click)="deleteLocation(location.id)"
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <button class="btn-primary mt-4" (click)="newLocation()">New Location</button>
+      </div>
+    </div>
+  </div>
+</div>

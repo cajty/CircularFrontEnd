@@ -1,1 +1,30 @@
-<p>category-list works!</p>
+<div class="category-list-container">
+  <div *ngIf="loading" class="flex justify-center items-center p-4">
+    <div class="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary"></div>
+  </div>
+
+
+  <div *ngIf="error" class="alert alert-error">
+    {{ error }}
+    <button class="ml-2 text-sm underline" (click)="retry()">Retry</button>
+  </div>
+
+
+  <div *ngIf="categories.length === 0 && !loading" class="p-4 text-center text-neutral-600 dark:text-neutral-400">
+    No categories available
+  </div>
+
+  <div *ngIf="categories.length > 0" class="category-list">
+    <ul class="divide-y divide-neutral-200 dark:divide-dark-border">
+      <li *ngFor="let category of categories"
+        class="py-2 px-3 cursor-pointer transition-colors duration-200 hover:bg-neutral-100 dark:hover:bg-dark-surface"
+        [class.bg-neutral-200]="isSelected(category.id)"
+        [class.dark:bg-dark-surface]="isSelected(category.id)"
+        (click)="onCategorySelect(category.id)">
+        <div class="flex items-center">
+          <span class="text-sm">{{ category.name }}</span>
+        </div>
+      </li>
+    </ul>
+  </div>
+</div>

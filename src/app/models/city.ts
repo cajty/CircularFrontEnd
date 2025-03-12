@@ -1,5 +1,3 @@
-
-
 export interface CityRequest {
   name: string;
   isActive: boolean;
@@ -11,4 +9,9 @@ export interface CityResponse {
   name: string;
   isActive: boolean;
   createdAt: Date;
+}
+
+export interface ActiveCityResponse {
+  id: number;
+  name: string;
 }

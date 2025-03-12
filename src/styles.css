@@ -172,5 +172,41 @@
   }
 }
 
+
+.form-input[type="select"] {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+}
+
+/* Smooth transitions */
+.city-list-container, .card {
+  transition: all 0.3s ease-in-out;
+}
+
+/* Enhanced hover states */
+.btn:hover {
+  transform: translateY(-1px);
+}
+
+.btn:active {
+  transform: translateY(1px);
+}
+
+/* Better table spacing */
+.table th, .table td {
+  @apply px-4 py-3;
+}
+
+/* Status badge animations */
+.badge {
+  @apply transition-all duration-200 ease-in-out;
+}
+
+/* Form focus states */
+.form-input:focus {
+  @apply ring-2 ring-primary ring-opacity-50;
+}
+
 html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }

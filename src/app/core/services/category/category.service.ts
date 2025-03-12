@@ -49,6 +49,12 @@ export class CategoryService {
     return this.http.get<any>(this.apiUrl, { params });
   }
 
+  getAllActiveCategories(): Observable<CategoryResponse[]> {
+    return this.http.get<CategoryResponse[]>(`${this.apiUrl}/active-category`);
+}
+
+
+
 
   changeCategoryStatus(id: number): Observable<void> {
     return this.http.get<void>(`${this.apiUrl}/status/${id}`);

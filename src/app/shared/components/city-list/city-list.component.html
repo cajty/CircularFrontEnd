@@ -1,1 +1,48 @@
-<p>city-list works!</p>
+<div class="city-list-container">
+  <!-- Loading state with text -->
+  <div *ngIf="loading" class="flex flex-col items-center justify-center p-6 space-y-3">
+    <div class="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary"></div>
+    <p class="text-neutral-600 dark:text-neutral-400">Loading cities...</p>
+  </div>
+
+  <!-- Error state with icon -->
+  <div *ngIf="error" class="alert alert-error flex items-center">
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+      <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+    </svg>
+    {{ error }}
+    <button class="btn btn-sm btn-outline ml-4" (click)="retry()">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
+        <path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clip-rule="evenodd" />
+      </svg>
+      Retry
+    </button>
+  </div>
+
+  <!-- Styled select dropdown -->
+  <div *ngIf="cities.length > 0" class="relative">
+    <select
+      (change)="onCitySelect($event)"
+      class="form-input pl-10 pr-4 py-3 w-full"
+      [class]="{'border-primary': selectedCityId}"
+    >
+      <option value="" disabled selected>Select a city...</option>
+      <option
+        *ngFor="let city of cities"
+        [value]="city.id"
+        [selected]="isSelected(city.id)"
+        class="flex items-center"
+      >
+        <svg *ngIf="isSelected(city.id)" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 text-primary inline" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+        </svg>
+        {{ city.name }}
+      </option>
+    </select>
+    <div class="absolute left-3 top-3.5 text-neutral-500">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+        <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" />
+      </svg>
+    </div>
+  </div>
+</div>

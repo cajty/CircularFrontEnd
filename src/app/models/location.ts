@@ -2,15 +2,21 @@ export interface LocationRequest {
   address: string;
   cityId: number;
   type: LocationType;
+  isActive: boolean;
   enterpriseId: number;
 }
 
 export interface LocationResponse {
   id: number;
   address: string;
-  cityId: number;
+  cityName: string;
   type: LocationType;
-  enterpriseId: number;
+  isActive: boolean;
+}
+
+export interface ActiveLocationResponse {
+  id: number;
+  address: string;
 }
 export enum LocationType {
     WAREHOUSE= "WAREHOUSE",
