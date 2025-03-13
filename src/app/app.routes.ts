@@ -1,5 +1,9 @@
 import { Routes } from '@angular/router';
 import {authGuard} from './core/guards/auth.guard';
+import {CategoryListComponent} from './shared/components/category-list/category-list.component';
+import {LocationListComponent} from './features/manager/location-list/location-list.component';
+import {MaterialComponent} from './features/manager/material/material.component';
+import {MaterialListComponent} from './features/manager/material-list/material-list.component';
 
 export const routes: Routes = [
     {
@@ -42,6 +46,34 @@ export const routes: Routes = [
     loadComponent: () => import('./features/manager/material/material.component').then(m => m.MaterialComponent),
     title: 'Manage Materials',
     canActivate: [authGuard]
+  },
+  {
+   path: 'categoryList',
+    loadComponent: () => import('./features/manager/location-list/location-list.component').then(m => m.LocationListComponent),
+
+  },
+   {
+    path: 'materials',
+    children: [
+      {
+        path: 'd',
+        component: MaterialListComponent,
+        title: 'Materials | Circular Economy Platform',
+        canActivate: [authGuard]
+      },
+      {
+        path: 'new',
+        component: MaterialComponent,
+        title: 'Add New Material | Circular Economy Platform',
+        canActivate: [authGuard]
+      },
+      {
+        path: ':id',
+        component: MaterialComponent,
+        title: 'Material Details | Circular Economy Platform',
+        canActivate: [authGuard]
+      }
+    ]
   },
 
   { path: '', redirectTo: '/Login', pathMatch: 'full' }

@@ -17,6 +17,7 @@ export interface LocationResponse {
 export interface ActiveLocationResponse {
   id: number;
   address: string;
+  cityName: string;
 }
 export enum LocationType {
     WAREHOUSE= "WAREHOUSE",

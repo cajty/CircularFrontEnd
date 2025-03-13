@@ -1,18 +1,212 @@
 <div class="container mx-auto p-4">
-  <h1 class="mb-6">{{ editMode ? 'Edit' : 'Create' }} Location</h1>
-  <div *ngIf="successMessage" class="alert alert-success mb-4 flex justify-between items-center">
-    <span>{{ successMessage }}</span>
-    <button class="text-sm" (click)="dismissSuccess()">✕</button>
-  </div>
+  <h1 class="mb-6">Locations Management</h1>
 
-  <div *ngIf="error" class="alert alert-error mb-4 flex justify-between items-center">
-    <span>{{ error }}</span>
-    <button class="text-sm" (click)="dismissError()">✕</button>
+  <!-- Notifications -->
+  @if (successMessage()) {
+    <div class="alert alert-success mb-4 flex justify-between items-center">
+      <span>{{ successMessage() }}</span>
+      <button class="text-sm" (click)="dismissSuccess()">✕</button>
+    </div>
+  }
+
+  @if (error()) {
+    <div class="alert alert-error mb-4 flex justify-between items-center">
+      <span>{{ error() }}</span>
+      <button class="text-sm" (click)="dismissError()">✕</button>
+    </div>
+  }
+
+  <!-- Location List -->
+  <div class="card">
+    <div class="flex justify-between items-center mb-4">
+      <h2>Locations</h2>
+      <button class="btn-primary" (click)="newLocation()">Add Location</button>
+    </div>
+
+    @if (loading()) {
+      <div class="flex justify-center items-center p-4">
+        <div class="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary" role="status">
+          <span class="sr-only">Loading...</span>
+        </div>
+      </div>
+    }
+
+    @if (locations().length === 0 && !loading()) {
+      <div class="p-4 text-center text-neutral-600">
+        No locations available
+      </div>
+    }
+
+    @if (locations().length > 0) {
+      <div class="table-container">
+        <table class="table w-full">
+          <thead>
+            <tr>
+              <th>
+                <div class="flex items-center cursor-pointer" (click)="changeSort('address')">
+                  Address
+                  <span class="ml-1">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M7 10l5 5 5-5"/>
+                    </svg>
+                  </span>
+                </div>
+              </th>
+              <th>
+                <div class="flex items-center cursor-pointer" (click)="changeSort('cityName')">
+                  City
+                  <span class="ml-1">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M7 10l5 5 5-5"/>
+                    </svg>
+                  </span>
+                </div>
+              </th>
+              <th>
+                <div class="flex items-center cursor-pointer" (click)="changeSort('type')">
+                  Type
+                  <span class="ml-1">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M7 10l5 5 5-5"/>
+                    </svg>
+                  </span>
+                </div>
+              </th>
+              <th>
+                <div class="flex items-center cursor-pointer" (click)="changeSort('isActive')">
+                  Status
+                  <span class="ml-1">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M7 10l5 5 5-5"/>
+                    </svg>
+                  </span>
+                </div>
+              </th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (location of locations(); track location.id) {
+              <tr>
+                <td>{{ location.address }}</td>
+                <td>{{ location.cityName }}</td>
+                <td>{{ location.type?.replace('_', ' ') || '' }}</td>
+                <td>
+                  <span
+                    class="badge"
+                    [ngClass]="location.isActive ? 'badge-green' : 'badge-gray'"
+                    [attr.aria-label]="location.isActive ? 'Active' : 'Inactive'"
+                  >
+                    {{ location.isActive ? 'Active' : 'Inactive' }}
+                  </span>
+                </td>
+                <td>
+                  <div class="flex space-x-2">
+                    <button
+                      class="btn-small btn-secondary"
+                      (click)="loadLocationDetails(location.id)"
+                      aria-label="Edit location"
+                    >
+                      Edit
+                    </button>
+                    <button
+                      class="btn-small btn-danger"
+                      (click)="deleteLocation(location.id)"
+                      aria-label="Delete location"
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Pagination Controls and Page Size -->
+      <div class="flex flex-wrap justify-between items-center mt-4 px-2">
+        <!-- Page Size Selector -->
+        <div class="flex items-center space-x-2 mb-2">
+          <label for="pageSize" class="text-sm">Items per page:</label>
+          <select
+            #pageSizeSelect
+            id="pageSize"
+            class="form-select text-sm p-1 border rounded"
+            [value]="pageSize()"
+            (change)="changePageSize(+pageSizeSelect.value)"
+          >
+            <option value="5">5</option>
+            <option value="10">10</option>
+            <option value="25">25</option>
+            <option value="50">50</option>
+          </select>
+        </div>
+
+        <!-- Pagination -->
+        @if (totalPages() > 1) {
+          <div class="flex space-x-1">
+            <button
+              class="btn-pagination"
+              [disabled]="currentPage() === 0"
+              (click)="changePage(currentPage() - 1)"
+              aria-label="Previous page"
+            >
+              &laquo;
+            </button>
+
+            @for (page of Array(totalPages()); track $index) {
+              <button
+                class="btn-pagination"
+                [class.btn-pagination-active]="$index === currentPage()"
+                (click)="changePage($index)"
+              >
+                {{ $index + 1 }}
+              </button>
+            }
+
+            <button
+              class="btn-pagination"
+              [disabled]="currentPage() === totalPages() - 1"
+              (click)="changePage(currentPage() + 1)"
+              aria-label="Next page"
+            >
+              &raquo;
+            </button>
+          </div>
+        }
+      </div>
+    }
   </div>
-  <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-    <!-- Left Column: Form -->
-    <div class="md:col-span-3">
-      <div class="card">
+</div>
+
+<!-- Modal -->
+@if (showModal()) {
+  <div class="fixed inset-0 z-50 overflow-auto bg-neutral-900 bg-opacity-50 flex items-center justify-center transition-all duration-300">
+    <div
+      class="bg-white dark:bg-dark-surface rounded-lg shadow-lg w-full max-w-3xl mx-4 transition-all duration-300 transform animate-fadeIn"
+      role="dialog"
+      aria-labelledby="locationModalTitle"
+      aria-modal="true"
+    >
+      <!-- Modal Header -->
+      <div class="flex justify-between items-center px-6 py-4 border-b border-neutral-200 dark:border-dark-border">
+        <h3 id="locationModalTitle" class="text-xl font-semibold text-neutral-900 dark:text-dark-text">
+          {{ editMode() ? 'Edit' : 'Create' }} Location
+        </h3>
+        <button
+          class="text-neutral-500 dark:text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-200 focus:outline-none"
+          (click)="closeModal()"
+          aria-label="Close modal"
+        >
+          <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+
+      <!-- Modal Body -->
+      <div class="px-6 py-4">
         <form [formGroup]="locationForm" (ngSubmit)="onSubmit()">
           <!-- Address Input -->
           <div class="mb-4">
@@ -23,24 +217,36 @@
               formControlName="address"
               class="form-input"
               [ngClass]="{'border-error': locationForm.get('address')?.invalid && locationForm.get('address')?.touched}"
-            >
-            <div *ngIf="locationForm.get('address')?.errors && locationForm.get('address')?.touched" class="form-error">
-              <span *ngIf="locationForm.get('address')?.errors?.['required']">Address is required</span>
-              <span *ngIf="locationForm.get('address')?.errors?.['minlength']">Address must be at least 5 characters</span>
-              <span *ngIf="locationForm.get('address')?.errors?.['maxlength']">Address cannot exceed 100 characters</span>
-            </div>
+            />
+            @if (locationForm.get('address')?.errors && locationForm.get('address')?.touched) {
+              <div class="form-error">
+                @if (locationForm.get('address')?.errors?.['required']) {
+                  <span>Address is required</span>
+                }
+                @if (locationForm.get('address')?.errors?.['minlength']) {
+                  <span>Address must be at least 5 characters</span>
+                }
+                @if (locationForm.get('address')?.errors?.['maxlength']) {
+                  <span>Address cannot exceed 100 characters</span>
+                }
+              </div>
+            }
           </div>
 
           <!-- City Selection -->
           <div class="mb-4">
             <label class="form-label">City</label>
             <app-city-list
-              [selectedCityId]="selectedCityId"
+              [selectedCityId]="selectedCityId()"
               (citySelected)="onCitySelected($event)"
-            ></app-city-list>
-            <div *ngIf="locationForm.get('cityId')?.errors && locationForm.get('cityId')?.touched" class="form-error mt-2">
-              <span *ngIf="locationForm.get('cityId')?.errors?.['required']">Please select a city</span>
-            </div>
+            />
+            @if (locationForm.get('cityId')?.errors && locationForm.get('cityId')?.touched) {
+              <div class="form-error mt-2">
+                @if (locationForm.get('cityId')?.errors?.['required']) {
+                  <span>Please select a city</span>
+                }
+              </div>
+            }
           </div>
 
           <!-- Location Type Dropdown -->
@@ -52,13 +258,19 @@
               class="form-input"
               [ngClass]="{'border-error': locationForm.get('type')?.invalid && locationForm.get('type')?.touched}"
             >
-              <option *ngFor="let type of locationTypes" [value]="type">
-                {{ type.replace('_', ' ') }}
-              </option>
+              @for (type of locationTypes; track type) {
+                <option [value]="type">
+                  {{ type.replace('_', ' ') }}
+                </option>
+              }
             </select>
-            <div *ngIf="locationForm.get('type')?.errors && locationForm.get('type')?.touched" class="form-error">
-              <span *ngIf="locationForm.get('type')?.errors?.['required']">Location type is required</span>
-            </div>
+            @if (locationForm.get('type')?.errors && locationForm.get('type')?.touched) {
+              <div class="form-error">
+                @if (locationForm.get('type')?.errors?.['required']) {
+                  <span>Location type is required</span>
+                }
+              </div>
+            }
           </div>
 
           <!-- Active Status -->
@@ -69,96 +281,41 @@
                 id="isActive"
                 formControlName="isActive"
                 class="mr-2 h-5 w-5 text-primary focus:ring-primary"
-              >
+              />
               <label for="isActive" class="form-label mb-0">Active Location</label>
             </div>
           </div>
 
           <!-- Hidden field for Enterprise ID -->
-          <input type="hidden" formControlName="enterpriseId">
-
-          <!-- Hidden field for City ID -->
-          <input type="hidden" formControlName="cityId">
-
-          <!-- Form Actions -->
-          <div class="flex justify-between mt-6">
-            <button
-              type="button"
-              class="btn-secondary"
-              (click)="resetForm()"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              class="btn-primary"
-              [disabled]="submitting || locationForm.invalid"
-            >
-              <span *ngIf="submitting" class="inline-block mr-2">
-                <span class="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white"></span>
-              </span>
-              {{ editMode ? 'Update' : 'Create' }} Location
-            </button>
-          </div>
+          <input type="hidden" formControlName="enterpriseId" />
         </form>
       </div>
 
-      <!-- Location List -->
-      <div class="card mt-6">
-        <h2 class="mb-4">Locations</h2>
-
-        <div *ngIf="loading" class="flex justify-center items-center p-4">
-          <div class="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary"></div>
-        </div>
-
-        <div *ngIf="locations.length === 0 && !loading" class="p-4 text-center text-neutral-600">
-          No locations available
-        </div>
-
-        <div *ngIf="locations.length > 0" class="table-container">
-          <table class="table w-full">
-            <thead>
-              <tr>
-                <th>Address</th>
-                <th>City</th>
-                <th>Type</th>
-                <th>Status</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let location of locations">
-                <td>{{ location.address }}</td>
-                <td>{{ location.cityName }}</td>
-                <td>{{ location.type.replace('_', ' ') }}</td>
-                <td>
-                  <span class="badge" [ngClass]="location.isActive ? 'badge-green' : 'badge-gray'">
-                    {{ location.isActive ? 'Active' : 'Inactive' }}
-                  </span>
-                </td>
-                <td>
-                  <div class="flex space-x-2">
-                    <button
-                      class="btn-small btn-secondary"
-                      (click)="loadLocationDetails(location.id)"
-                    >
-                      Edit
-                    </button>
-                    <button
-                      class="btn-small btn-danger"
-                      (click)="deleteLocation(location.id)"
-                    >
-                      Delete
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-
-        <button class="btn-primary mt-4" (click)="newLocation()">New Location</button>
+      <!-- Modal Footer -->
+      <div class="flex justify-end items-center gap-3 px-6 py-4 border-t border-neutral-200 dark:border-dark-border">
+        <button
+          type="button"
+          class="btn-secondary"
+          (click)="closeModal()"
+        >
+          Cancel
+        </button>
+        <button
+          type="button"
+          class="btn-primary flex items-center"
+          [disabled]="submitting() || locationForm.invalid"
+          (click)="onSubmit()"
+        >
+          @if (submitting()) {
+            <span class="inline-block mr-2">
+              <span class="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white" role="status">
+                <span class="sr-only">Loading...</span>
+              </span>
+            </span>
+          }
+          {{ editMode() ? 'Update' : 'Create' }} Location
+        </button>
       </div>
     </div>
   </div>
-</div>
+}

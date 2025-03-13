@@ -1,0 +1,184 @@
+<div class="material-form-container p-4">
+  <form [formGroup]="materialForm" (ngSubmit)="onSubmit()">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <!-- Left column -->
+      <div class="space-y-6">
+        <!-- Material Name -->
+        <div class="form-control">
+          <label class="label">
+            <span class="label-text font-medium">Material Name<span class="text-error">*</span></span>
+          </label>
+          <input
+            type="text"
+            formControlName="name"
+            placeholder="Enter material name"
+            class="input input-bordered w-full"
+            [ngClass]="{'input-error': isControlInvalid('name')}"
+          />
+          <div *ngIf="hasError('name', 'required')" class="text-error text-sm mt-1">
+            Material name is required
+          </div>
+        </div>
+
+        <!-- Description -->
+        <div class="form-control">
+          <label class="label">
+            <span class="label-text font-medium">Description</span>
+          </label>
+          <textarea
+            formControlName="description"
+            placeholder="Enter material description"
+            class="textarea textarea-bordered h-20"
+          ></textarea>
+        </div>
+
+        <!-- Quantity -->
+        <div class="form-control">
+          <label class="label">
+            <span class="label-text font-medium">Quantity<span class="text-error">*</span></span>
+          </label>
+          <input
+            type="number"
+            formControlName="quantity"
+            placeholder="Enter quantity"
+            class="input input-bordered w-full"
+            [ngClass]="{'input-error': isControlInvalid('quantity')}"
+            min="10"
+          />
+          <div *ngIf="hasError('quantity', 'required')" class="text-error text-sm mt-1">
+            Quantity is required
+          </div>
+          <div *ngIf="hasError('quantity', 'min')" class="text-error text-sm mt-1">
+            Quantity must be at least 10
+          </div>
+        </div>
+
+        <!-- Price -->
+        <div class="form-control">
+          <label class="label">
+            <span class="label-text font-medium">Price</span>
+          </label>
+          <input
+            type="number"
+            formControlName="price"
+            placeholder="Enter price"
+            class="input input-bordered w-full"
+            [ngClass]="{'input-error': isControlInvalid('price')}"
+            min="0"
+            step="0.01"
+          />
+          <div *ngIf="hasError('price', 'min')" class="text-error text-sm mt-1">
+            Price must be at least 0
+          </div>
+        </div>
+      </div>
+
+      <!-- Right column -->
+      <div class="space-y-6">
+        <!-- Available Until Date -->
+        <div class="form-control">
+          <label class="label">
+            <span class="label-text font-medium">Available Until<span class="text-error">*</span></span>
+          </label>
+          <input
+            type="date"
+            formControlName="availableUntil"
+            class="input input-bordered w-full"
+            [ngClass]="{'input-error': isControlInvalid('availableUntil')}"
+          />
+          <div *ngIf="hasError('availableUntil', 'required')" class="text-error text-sm mt-1">
+            Available until date is required
+          </div>
+        </div>
+
+        <!-- Material Status -->
+        <div class="form-control">
+          <label class="label">
+            <span class="label-text font-medium">Status<span class="text-error">*</span></span>
+          </label>
+          <select
+            formControlName="status"
+            class="select select-bordered w-full"
+            [ngClass]="{'select-error': isControlInvalid('status')}"
+          >
+            <option [ngValue]="null" disabled>Select status</option>
+            <option *ngFor="let status of materialStatusOptions" [ngValue]="status">
+              {{ status }}
+            </option>
+          </select>
+          <div *ngIf="hasError('status', 'required')" class="text-error text-sm mt-1">
+            Status is required
+          </div>
+        </div>
+
+        <!-- Hazard Level -->
+        <div class="form-control">
+          <label class="label">
+            <span class="label-text font-medium">Hazard Level<span class="text-error">*</span></span>
+          </label>
+          <select
+            formControlName="hazardLevel"
+            class="select select-bordered w-full"
+            [ngClass]="{'select-error': isControlInvalid('hazardLevel')}"
+          >
+            <option [ngValue]="null" disabled>Select hazard level</option>
+            <option *ngFor="let level of hazardLevelOptions" [ngValue]="level">
+              {{ level }}
+            </option>
+          </select>
+          <div *ngIf="hasError('hazardLevel', 'required')" class="text-error text-sm mt-1">
+            Hazard level is required
+          </div>
+        </div>
+
+        <!-- Category Selection -->
+        <div class="form-control">
+          <label class="label">
+            <span class="label-text font-medium">Category<span class="text-error">*</span></span>
+          </label>
+          <app-category-list
+            [selectedCategoryId]="materialForm.get('categoryId')?.value"
+            (categorySelected)="onCategorySelected($event)">
+          </app-category-list>
+          <div *ngIf="submitted && !materialForm.get('categoryId')?.value" class="text-error text-sm mt-1">
+            Category is required
+          </div>
+        </div>
+
+        <!-- Location Selection -->
+        <div class="form-control">
+          <label class="label">
+            <span class="label-text font-medium">Location<span class="text-error">*</span></span>
+          </label>
+          <app-location-list
+            [selectedLocationId]="materialForm.get('locationId')?.value"
+            (locationSelected)="onLocationSelected($event)">
+          </app-location-list>
+          <div *ngIf="submitted && !materialForm.get('locationId')?.value" class="text-error text-sm mt-1">
+            Location is required
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Form Actions -->
+    <div class="flex justify-end space-x-4 mt-8">
+      <button
+        type="button"
+        class="btn btn-outline"
+        (click)="onCancel()"
+        [disabled]="submitting"
+      >
+        Cancel
+      </button>
+      <button
+        type="submit"
+        class="btn btn-primary"
+        [disabled]="submitting"
+      >
+        <span *ngIf="submitting" class="loading loading-spinner loading-xs mr-2"></span>
+        {{ material ? 'Update' : 'Create' }} Material
+      </button>
+    </div>
+  </form>
+</div>

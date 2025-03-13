@@ -1,8 +1,9 @@
 import { Injectable, inject } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import {HttpClient, HttpParams} from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../../environments/environment';
 import {ActiveLocationResponse, LocationRequest, LocationResponse} from '../../../models/location';
+import {Page} from '../../../models/page';
 
 @Injectable({
   providedIn: 'root'
@@ -27,12 +28,20 @@ export class LocationService {
   }
 
 
-  getAllActiveLocations(): Observable<Set<ActiveLocationResponse>> {
-    return this.http.get<Set<ActiveLocationResponse>>(`${this.apiUrl}/active`);
+
+   getAllLocationOfEnterprise(page: number = 1, size: number = 10, sort: string = 'id,desc'): Observable<Page<LocationResponse>> {
+    let params = new HttpParams()
+      .set('page', page.toString())
+      .set('size', size.toString())
+      .set('sort', sort);
+
+    return this.http.get<Page<LocationResponse>>(`${this.apiUrl}/enterprise`, { params });
   }
-  getAllLocationOfEnterprise(): Observable<Set<ActiveLocationResponse>> {
-    return this.http.get<Set<ActiveLocationResponse>>(`${this.apiUrl}/enterprise`);
-  }
+
+   getAllActiveLocationsOfEnterprise(): Observable<Set<ActiveLocationResponse>> {
+     return this.http.get<Set<ActiveLocationResponse>>(`${this.apiUrl}/enterprise-active`);
+   }
+
 
 
   update(id: number, locationRequest: LocationRequest): Observable<LocationResponse> {

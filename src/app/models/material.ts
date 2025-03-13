@@ -1,5 +1,5 @@
 import {CategoryResponse} from './materialCategory';
-import {LocationResponse} from './location';
+import {ActiveLocationResponse, LocationResponse} from './location';
 
 export interface MaterialRequest {
   name: string;
@@ -24,7 +24,7 @@ export interface MaterialResponse {
   availableUntil: Date;
   category: CategoryResponse;
   hazardLevel: HazardLevel;
-  location: LocationResponse;
+  location: ActiveLocationResponse;
 }
 
 export enum MaterialStatus {
@@ -33,6 +33,13 @@ export enum MaterialStatus {
   SOLD = "SOLD",
   EXPIRED = "EXPIRED",
   PENDING = "PENDING"
+}
+
+export interface MaterialSearchFilters {
+  name?: string;
+  minPrice?: number;
+  maxPrice?: number;
+  status?: MaterialStatus;
 }
 
 export enum HazardLevel {

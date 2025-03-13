@@ -1,0 +1,16 @@
+.location-list-container {
+  @apply w-full mb-4;
+}
+
+select option {
+  @apply py-2;
+}
+
+select option:checked {
+  @apply bg-primary text-white;
+}
+
+
+.alert, .form-input {
+  @apply transition-all duration-300 ease-in-out;
+}

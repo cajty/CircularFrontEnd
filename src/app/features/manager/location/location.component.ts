@@ -1,14 +1,13 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, effect, signal, computed, DestroyRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { finalize } from 'rxjs';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { LocationService } from '../../../core/services/location/location.service';
-
-
 import { LocationResponse, LocationRequest, LocationType } from '../../../models/location';
-import {CityListComponent} from '../../../shared/components/city-list/city-list.component';
+import { CityListComponent } from '../../../shared/components/city-list/city-list.component';
+import { toSignal, toObservable } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-location',
@@ -22,38 +21,50 @@ import {CityListComponent} from '../../../shared/components/city-list/city-list.
   templateUrl: './location.component.html',
   styleUrl: './location.component.css'
 })
-export class LocationComponent implements OnInit {
-  // Form and state management
-  locationForm: FormGroup;
-  editMode = false;
-  currentLocationId: number | null = null;
+export class LocationComponent {
+  // Dependency injection
+  private fb = inject(FormBuilder);
+  private locationService = inject(LocationService);
+  private destroyRef = inject(DestroyRef);
 
-  // Data containers
-  locations: LocationResponse[] = [];
-  selectedLocation: LocationResponse | null = null;
+  // Make Array constructor available for the template
+  protected readonly Array = Array;
 
-  // UI state flags
-  loading = false;
-  submitting = false;
-  error: string | null = null;
-  successMessage: string | null = null;
+  // Signal-based state management
+  locations = signal<LocationResponse[]>([]);
+  loading = signal(false);
+  submitting = signal(false);
+  error = signal<string | null>(null);
+  successMessage = signal<string | null>(null);
+  showModal = signal(false);
+  editMode = signal(false);
+  currentLocationId = signal<number | null>(null);
+  selectedCityId = signal<number | null>(null);
 
-  // Selected IDs from child components
-  selectedCityId: number | null = null;
-  selectedCategoryId: number | null = null;
+  // Pagination as signals
+  currentPage = signal(0);
+  pageSize = signal(10);
+  totalItems = signal(0);
+  totalPages = signal(0);
+  sortField = signal('id,desc');
 
-  // Location types for dropdown
+  // Constants
   locationTypes = Object.values(LocationType);
 
-  constructor(
-    private fb: FormBuilder,
-    private locationService: LocationService
-  ) {
-    this.locationForm = this.createLocationForm();
-  }
+  // Reactive form setup
+  locationForm = this.createLocationForm();
 
-  ngOnInit(): void {
+  constructor() {
+    // Initialize data on component creation
     this.loadLocations();
+
+    // Setup effects for reactive behavior
+    effect(() => {
+      // This effect re-runs when page, size, or sort changes
+      if (this.currentPage() !== undefined || this.pageSize() !== undefined || this.sortField() !== undefined) {
+        this.loadLocations();
+      }
+    });
   }
 
   // Form initialization
@@ -63,129 +74,123 @@ export class LocationComponent implements OnInit {
       cityId: [null, [Validators.required]],
       type: [LocationType.WAREHOUSE, [Validators.required]],
       isActive: [true],
-      enterpriseId: [1, [Validators.required]] // Default value, adjust as needed
+      enterpriseId: [1, [Validators.required]]
     });
   }
 
-  // Data loading functions
+  // Data loading methods
   private loadLocations(): void {
-    // Mock data or alternative implementation
-    this.loading = true;
-    this.error = null;
+    this.loading.set(true);
+    this.error.set(null);
 
-    // Setting loading to false since we're not making an actual API call
-    this.loading = false;
-
-    // Example of mock data
-    this.locations = [
-      // Add sample locations if needed for testing
-      /* Example:
-      {
-        id: 1,
-        address: '123 Main St',
-        cityName: 'New York',
-        type: LocationType.WAREHOUSE,
-        isActive: true
+    this.locationService.getAllLocationOfEnterprise(
+      this.currentPage(),
+      this.pageSize(),
+      this.sortField()
+    )
+    .pipe(takeUntilDestroyed(this.destroyRef))
+    .subscribe({
+      next: (page) => {
+        this.locations.set(page.content);
+        this.totalItems.set(page.totalElements);
+        this.totalPages.set(page.totalPages);
+        this.currentPage.set(page.number);
+        this.loading.set(false);
+      },
+      error: (err) => {
+        console.error('Error loading locations', err);
+        this.error.set('Failed to load locations. Please try again.');
+        this.loading.set(false);
       }
-      */
-    ];
-
-    // Note: Replace this with actual implementation when available:
-    // this.locationService.getAll().pipe(finalize(() => this.loading = false))
-    //   .subscribe({
-    //     next: (locations) => { this.locations = locations; },
-    //     error: (err) => {
-    //       console.error('Error loading locations', err);
-    //       this.error = 'Failed to load locations. Please try again.';
-    //     }
-    //   });
+    });
   }
 
   loadLocationDetails(id: number): void {
-    this.loading = true;
-    this.error = null;
+    this.loading.set(true);
+    this.error.set(null);
 
     this.locationService.getById(id)
-      .pipe(finalize(() => this.loading = false))
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (location) => {
-          this.selectedLocation = location;
           this.patchFormWithLocation(location);
-          this.editMode = true;
-          this.currentLocationId = location.id;
-          this.selectedCityId = null; // We don't have cityId in the response
+          this.editMode.set(true);
+          this.currentLocationId.set(location.id);
+          this.selectedCityId.set(null); // Reset city selection
+          this.showModal.set(true);
+          this.loading.set(false);
         },
         error: (err) => {
           console.error('Error loading location details', err);
-          this.error = 'Failed to load location details.';
+          this.error.set('Failed to load location details.');
+          this.loading.set(false);
         }
       });
   }
 
-  // Form handling
   patchFormWithLocation(location: LocationResponse): void {
     this.locationForm.patchValue({
       address: location.address,
       type: location.type,
-      isActive: location.isActive
-      // We don't have cityId or enterpriseId in the response,
-      // so we keep whatever is already in the form
+      isActive: location.isActive,
+      cityId: location.id
     });
+    this.selectedCityId.set(location.id);
   }
 
-  // Event handlers from child components
   onCitySelected(cityId: number): void {
-    this.selectedCityId = cityId;
+    this.selectedCityId.set(cityId);
     this.locationForm.patchValue({ cityId });
   }
 
-  // CRUD operations
   onSubmit(): void {
     if (this.locationForm.invalid) {
       this.locationForm.markAllAsTouched();
       return;
     }
 
-    this.submitting = true;
-    this.error = null;
-    this.successMessage = null;
+    this.submitting.set(true);
+    this.error.set(null);
+    this.successMessage.set(null);
 
-    const locationData: LocationRequest = {
-      address: this.locationForm.value.address,
-      cityId: this.locationForm.value.cityId,
-      type: this.locationForm.value.type,
-      isActive: this.locationForm.value.isActive,
-      enterpriseId: this.locationForm.value.enterpriseId
-    };
+    const locationData: LocationRequest = this.locationForm.value as LocationRequest;
 
-    const request = this.editMode && this.currentLocationId
-      ? this.locationService.update(this.currentLocationId, locationData)
+    const request = this.editMode() && this.currentLocationId()
+      ? this.locationService.update(this.currentLocationId()!, locationData)
       : this.locationService.create(locationData);
 
-    request.pipe(finalize(() => this.submitting = false))
+    request
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (result) => {
-          this.successMessage = `Location successfully ${this.editMode ? 'updated' : 'created'}.`;
+          this.successMessage.set(`Location successfully ${this.editMode() ? 'updated' : 'created'}.`);
 
-          // Update local array instead of reloading from service
-          if (this.editMode && this.currentLocationId && result) {
-            // Update existing item in array
-            const index = this.locations.findIndex(loc => loc.id === this.currentLocationId);
+          if (this.editMode() && this.currentLocationId() && result) {
+            // Update existing location in the list
+            const currentLocations = this.locations();
+            const index = currentLocations.findIndex(loc => loc.id === this.currentLocationId());
+
             if (index !== -1) {
-              this.locations[index] = result;
+              const updatedLocations = [...currentLocations];
+              updatedLocations[index] = result;
+              this.locations.set(updatedLocations);
             }
           } else if (result) {
-            // Add new item to array
-            this.locations.push(result);
+            // Add new location to the list
+            this.locations.update(currentLocations => [...currentLocations, result]);
           }
 
-          if (!this.editMode) {
+          this.showModal.set(false);
+          this.submitting.set(false);
+
+          if (!this.editMode()) {
             this.resetForm();
           }
         },
         error: (err) => {
           console.error('Error saving location', err);
-          this.error = `Failed to ${this.editMode ? 'update' : 'create'} location.`;
+          this.error.set(`Failed to ${this.editMode() ? 'update' : 'create'} location.`);
+          this.submitting.set(false);
         }
       });
   }
@@ -195,52 +200,88 @@ export class LocationComponent implements OnInit {
       return;
     }
 
-    this.loading = true;
-    this.error = null;
+    this.loading.set(true);
+    this.error.set(null);
 
     this.locationService.delete(id)
-      .pipe(finalize(() => this.loading = false))
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: () => {
-          this.successMessage = 'Location successfully deleted.';
+          this.successMessage.set('Location successfully deleted.');
 
-          // Remove the deleted location from the local array instead of reloading
-          this.locations = this.locations.filter(location => location.id !== id);
+          // Remove the deleted location from the list
+          this.locations.update(currentLocations =>
+            currentLocations.filter(location => location.id !== id)
+          );
 
-          if (this.currentLocationId === id) {
+          if (this.currentLocationId() === id) {
             this.resetForm();
           }
+
+          this.loading.set(false);
         },
         error: (err) => {
           console.error('Error deleting location', err);
-          this.error = 'Failed to delete location.';
+          this.error.set('Failed to delete location.');
+          this.loading.set(false);
         }
       });
   }
 
-  // UI helpers
+  // Pagination controls
+  changePage(page: number): void {
+    if (page !== this.currentPage()) {
+      this.currentPage.set(page);
+    }
+  }
+
+  changePageSize(size: number): void {
+    if (size !== this.pageSize()) {
+      this.pageSize.set(size);
+      this.currentPage.set(0);
+    }
+  }
+
+  changeSort(sortField: string): void {
+    // Toggle sort direction if clicking on the same field
+    if (this.sortField().split(',')[0] === sortField) {
+      const currentDirection = this.sortField().split(',')[1];
+      const newDirection = currentDirection === 'asc' ? 'desc' : 'asc';
+      this.sortField.set(`${sortField},${newDirection}`);
+    } else {
+      // Default to ascending for a new sort field
+      this.sortField.set(`${sortField},asc`);
+    }
+  }
+
+  // UI helper methods
+  dismissError(): void {
+    this.error.set(null);
+  }
+
   resetForm(): void {
     this.locationForm.reset({
       isActive: true,
       type: LocationType.WAREHOUSE,
-      enterpriseId: 1 // Default value, adjust as needed
+      enterpriseId: 1
     });
-    this.editMode = false;
-    this.currentLocationId = null;
-    this.selectedCityId = null;
-    this.selectedCategoryId = null;
-    this.selectedLocation = null;
+    this.editMode.set(false);
+    this.currentLocationId.set(null);
+    this.selectedCityId.set(null);
   }
 
   newLocation(): void {
     this.resetForm();
+    this.showModal.set(true);
   }
 
   dismissSuccess(): void {
-    this.successMessage = null;
+    this.successMessage.set(null);
   }
 
-  dismissError(): void {
-    this.error = null;
+  closeModal(): void {
+    this.showModal.set(false);
   }
+
+  protected readonly HTMLSelectElement = HTMLSelectElement;
 }
