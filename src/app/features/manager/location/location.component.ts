@@ -8,6 +8,7 @@ import { LocationService } from '../../../core/services/location/location.servic
 import { LocationResponse, LocationRequest, LocationType } from '../../../models/location';
 import { CityListComponent } from '../../../shared/components/city-list/city-list.component';
 import { toSignal, toObservable } from '@angular/core/rxjs-interop';
+import { ToastService } from '../../../core/services/toast/toast.service';
 
 @Component({
   selector: 'app-location',
@@ -26,6 +27,7 @@ export class LocationComponent {
   private fb = inject(FormBuilder);
   private locationService = inject(LocationService);
   private destroyRef = inject(DestroyRef);
+  private toastService = inject(ToastService); // Add this line
 
   // Make Array constructor available for the template
   protected readonly Array = Array;
@@ -34,8 +36,6 @@ export class LocationComponent {
   locations = signal<LocationResponse[]>([]);
   loading = signal(false);
   submitting = signal(false);
-  error = signal<string | null>(null);
-  successMessage = signal<string | null>(null);
   showModal = signal(false);
   editMode = signal(false);
   currentLocationId = signal<number | null>(null);
@@ -81,7 +81,6 @@ export class LocationComponent {
   // Data loading methods
   private loadLocations(): void {
     this.loading.set(true);
-    this.error.set(null);
 
     this.locationService.getAllLocationOfEnterprise(
       this.currentPage(),
@@ -99,7 +98,7 @@ export class LocationComponent {
       },
       error: (err) => {
         console.error('Error loading locations', err);
-        this.error.set('Failed to load locations. Please try again.');
+        this.toastService.error('Failed to load locations. Please try again.'); // Changed this line
         this.loading.set(false);
       }
     });
@@ -107,7 +106,6 @@ export class LocationComponent {
 
   loadLocationDetails(id: number): void {
     this.loading.set(true);
-    this.error.set(null);
 
     this.locationService.getById(id)
       .pipe(takeUntilDestroyed(this.destroyRef))
@@ -122,7 +120,7 @@ export class LocationComponent {
         },
         error: (err) => {
           console.error('Error loading location details', err);
-          this.error.set('Failed to load location details.');
+          this.toastService.error('Failed to load location details.'); // Changed this line
           this.loading.set(false);
         }
       });
@@ -150,8 +148,6 @@ export class LocationComponent {
     }
 
     this.submitting.set(true);
-    this.error.set(null);
-    this.successMessage.set(null);
 
     const locationData: LocationRequest = this.locationForm.value as LocationRequest;
 
@@ -163,7 +159,7 @@ export class LocationComponent {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (result) => {
-          this.successMessage.set(`Location successfully ${this.editMode() ? 'updated' : 'created'}.`);
+          this.toastService.success(`Location successfully ${this.editMode() ? 'updated' : 'created'}.`); // Changed this line
 
           if (this.editMode() && this.currentLocationId() && result) {
             // Update existing location in the list
@@ -189,7 +185,7 @@ export class LocationComponent {
         },
         error: (err) => {
           console.error('Error saving location', err);
-          this.error.set(`Failed to ${this.editMode() ? 'update' : 'create'} location.`);
+          this.toastService.error(`Failed to ${this.editMode() ? 'update' : 'create'} location.`); // Changed this line
           this.submitting.set(false);
         }
       });
@@ -201,13 +197,12 @@ export class LocationComponent {
     }
 
     this.loading.set(true);
-    this.error.set(null);
 
     this.locationService.delete(id)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: () => {
-          this.successMessage.set('Location successfully deleted.');
+          this.toastService.success('Location successfully deleted.'); // Changed this line
 
           // Remove the deleted location from the list
           this.locations.update(currentLocations =>
@@ -222,7 +217,7 @@ export class LocationComponent {
         },
         error: (err) => {
           console.error('Error deleting location', err);
-          this.error.set('Failed to delete location.');
+          this.toastService.error('Failed to delete location.'); // Changed this line
           this.loading.set(false);
         }
       });
@@ -255,10 +250,6 @@ export class LocationComponent {
   }
 
   // UI helper methods
-  dismissError(): void {
-    this.error.set(null);
-  }
-
   resetForm(): void {
     this.locationForm.reset({
       isActive: true,
@@ -273,10 +264,6 @@ export class LocationComponent {
   newLocation(): void {
     this.resetForm();
     this.showModal.set(true);
-  }
-
-  dismissSuccess(): void {
-    this.successMessage.set(null);
   }
 
   closeModal(): void {

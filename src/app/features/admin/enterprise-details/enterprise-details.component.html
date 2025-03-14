@@ -1,161 +1,108 @@
 <div class="container mx-auto px-4 py-6">
-  <!-- Back button -->
-  <button (click)="goBack()" class="flex items-center text-neutral-600 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white mb-4">
+  <!-- Back button with improved hover effect -->
+  <button (click)="goBack()" class="flex items-center text-neutral-600 hover:text-primary dark:text-neutral-400 dark:hover:text-primary mb-4 transition-colors duration-200">
     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
     </svg>
     Back to Enterprises
   </button>
 
-  <!-- Loading Skeleton -->
+  <!-- Loading Skeleton with smoother animation -->
   <div *ngIf="isLoading" class="animate-pulse space-y-6">
-    <div class="h-8 bg-neutral-200 dark:bg-dark-surface rounded w-1/3"></div>
-    <div class="h-64 bg-neutral-200 dark:bg-dark-surface rounded"></div>
-    <div class="h-48 bg-neutral-200 dark:bg-dark-surface rounded"></div>
+    <div class="h-8 bg-neutral-200 dark:bg-dark-surface rounded-md w-1/3"></div>
+    <div class="h-64 bg-neutral-200 dark:bg-dark-surface rounded-md"></div>
+    <div class="h-48 bg-neutral-200 dark:bg-dark-surface rounded-md"></div>
   </div>
 
-  <div *ngIf="!isLoading && enterprise">
-    <!-- Page Header -->
-    <div class="mb-6 flex justify-between items-center">
-      <div>
-        <h1 class="text-2xl font-bold text-neutral-900 dark:text-dark-text flex items-center">
-          {{ enterprise.name }}
-          <span [ngClass]="getStatusClass(enterprise.status)" class="badge ml-3">
-            {{ enterprise.status }}
-          </span>
-        </h1>
-        <p class="text-neutral-600 dark:text-dark-text text-sm mt-1">Registration Number: {{ enterprise.registrationNumber }}</p>
+  <div *ngIf="!isLoading && enterprise" class="animate-fadeIn">
+    <!-- Page Header with improved styling -->
+    <div class="mb-6">
+      <div class="flex flex-col md:flex-row md:items-center md:justify-between">
+        <div>
+          <h1 class="text-2xl font-bold text-neutral-900 dark:text-dark-text flex items-center flex-wrap">
+            {{ enterprise.name }}
+            <span [ngClass]="getStatusClass(enterprise.status)" class="badge ml-3 mt-1">
+              {{ enterprise.status }}
+            </span>
+          </h1>
+          <p class="text-neutral-600 dark:text-neutral-400 text-sm mt-1">
+            Registration Number: <span class="font-semibold">{{ enterprise.registrationNumber }}</span>
+          </p>
+        </div>
+
+        <!-- Enterprise Type Badge -->
+        <div class="mt-4 md:mt-0">
+          <span class="badge-blue">{{ enterprise.type }}</span>
+        </div>
       </div>
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
       <!-- Enterprise Details Section -->
       <div class="lg:col-span-2">
-        <div class="card">
-          <h2 class="text-xl font-semibold mb-4">Enterprise Details</h2>
+        <div class="card shadow-sm hover:shadow-md transition-shadow duration-300">
+          <div class="flex items-center mb-6">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-primary mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+            </svg>
+            <h2 class="text-xl font-semibold">Enterprise Details</h2>
+          </div>
 
-          <form [formGroup]="enterpriseForm" (ngSubmit)="saveEnterpriseDetails()" class="space-y-4">
-            <!-- Enterprise Name -->
-            <div class="form-group">
-              <label for="name" class="form-label">Enterprise Name</label>
-              <input
-                type="text"
-                id="name"
-                formControlName="name"
-                class="form-input"
-                [ngClass]="{'border-red-500': enterpriseForm.get('name')?.invalid && enterpriseForm.get('name')?.touched}"
-              >
-              <div *ngIf="enterpriseForm.get('name')?.invalid && enterpriseForm.get('name')?.touched" class="form-error">
-                <span *ngIf="enterpriseForm.get('name')?.errors?.['required']">Name is required</span>
-                <span *ngIf="enterpriseForm.get('name')?.errors?.['minlength']">Name must be at least 3 characters</span>
+          <!-- Details display in a cleaner format -->
+          <div class="space-y-4 bg-neutral-50 dark:bg-dark-surface rounded-md p-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <!-- Enterprise Name -->
+              <div>
+                <p class="text-sm text-neutral-500 dark:text-neutral-400">Enterprise Name</p>
+                <p class="text-lg font-medium">{{ enterprise.name }}</p>
+              </div>
+
+              <!-- Registration Number -->
+              <div>
+                <p class="text-sm text-neutral-500 dark:text-neutral-400">Registration Number</p>
+                <p class="text-lg font-medium">{{ enterprise.registrationNumber }}</p>
+              </div>
+
+              <!-- Enterprise Type -->
+              <div>
+                <p class="text-sm text-neutral-500 dark:text-neutral-400">Enterprise Type</p>
+                <p class="text-lg font-medium">{{ enterprise.type }}</p>
+              </div>
+
+              <!-- Status -->
+              <div>
+                <p class="text-sm text-neutral-500 dark:text-neutral-400">Status</p>
+                <div class="flex items-center">
+                  <span [ngClass]="getStatusClass(enterprise.status)" class="badge">
+                    {{ enterprise.status }}
+                  </span>
+                </div>
               </div>
             </div>
-
-            <!-- Registration Number -->
-            <div class="form-group">
-              <label for="registrationNumber" class="form-label">Registration Number</label>
-              <input
-                type="text"
-                id="registrationNumber"
-                formControlName="registrationNumber"
-                class="form-input"
-                [ngClass]="{'border-red-500': enterpriseForm.get('registrationNumber')?.invalid && enterpriseForm.get('registrationNumber')?.touched}"
-              >
-              <div *ngIf="enterpriseForm.get('registrationNumber')?.invalid && enterpriseForm.get('registrationNumber')?.touched" class="form-error">
-                <span *ngIf="enterpriseForm.get('registrationNumber')?.errors?.['required']">Registration number is required</span>
-                <span *ngIf="enterpriseForm.get('registrationNumber')?.errors?.['pattern']">Registration number must be 5-15 characters and contain only uppercase letters and numbers</span>
-              </div>
-            </div>
-
-            <!-- Enterprise Type -->
-            <div class="form-group">
-              <label for="enterpriseType" class="form-label">Enterprise Type</label>
-              <select
-                id="enterpriseType"
-                formControlName="enterpriseType"
-                class="form-input"
-              >
-                <option *ngFor="let type of enterpriseTypes" [value]="type">{{ type }}</option>
-              </select>
-            </div>
-
-            <!-- Submit Button -->
-            <div class="flex justify-end">
-              <button
-                type="submit"
-                class="btn-primary"
-                [disabled]="isSubmitting || enterpriseForm.invalid"
-              >
-                <span *ngIf="isSubmitting" class="inline-block animate-spin mr-2">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                  </svg>
-                </span>
-                Save Details
-              </button>
-            </div>
-          </form>
+          </div>
         </div>
 
-        <!-- Document Upload Section -->
-        <div class="card mt-6">
-          <h2 class="text-xl font-semibold mb-4">Verification Documents</h2>
-
-          <!-- Upload new document -->
-          <div class="bg-neutral-50 dark:bg-dark-surface p-4 rounded-md border border-neutral-200 dark:border-dark-border mb-6">
-            <h3 class="font-medium text-lg mb-3">Upload New Document</h3>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-              <!-- Document Type -->
-              <div>
-                <label for="document-type" class="form-label">Document Type</label>
-                <select
-                  id="document-type"
-                  [(ngModel)]="selectedDocumentType"
-                  class="form-input"
-                >
-                  <option *ngFor="let type of documentTypes" [value]="type">{{ type }}</option>
-                </select>
-              </div>
-
-              <!-- File Upload -->
-              <div>
-                <label for="document-file" class="form-label">Document File</label>
-                <input
-                  type="file"
-                  id="document-file"
-                  (change)="onFileSelected($event)"
-                  class="form-input p-2"
-                  accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
-                >
-              </div>
-            </div>
-
-            <div class="flex justify-end">
-              <button
-                (click)="uploadDocument()"
-                class="btn-primary"
-                [disabled]="isUploadingDocument || !selectedFile"
-              >
-                <span *ngIf="isUploadingDocument" class="inline-block animate-spin mr-2">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                  </svg>
-                </span>
-                Upload Document
-              </button>
-            </div>
-          </div>
-
-          <!-- Document List -->
-          <div *ngIf="verificationDocuments.length === 0" class="text-center py-8">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto text-neutral-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <!-- Document Section with improved design -->
+        <div class="card mt-6 shadow-sm hover:shadow-md transition-shadow duration-300">
+          <div class="flex items-center mb-6">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-primary mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
             </svg>
-            <p class="mt-2 text-neutral-600 dark:text-neutral-400">No verification documents uploaded yet</p>
+            <h2 class="text-xl font-semibold">Verification Documents</h2>
           </div>
 
-          <div *ngIf="verificationDocuments.length > 0" class="overflow-x-auto">
+          <!-- Document List with improved empty state -->
+          <div *ngIf="verificationDocuments.length === 0" class="text-center py-8 bg-neutral-50 dark:bg-dark-surface rounded-md p-6">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto text-neutral-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+            <h3 class="mt-4 font-medium text-neutral-800 dark:text-neutral-200">No Documents Yet</h3>
+            <p class="mt-2 text-neutral-600 dark:text-neutral-400 max-w-md mx-auto">
+              No verification documents have been uploaded for this enterprise.
+            </p>
+          </div>
+
+          <div *ngIf="verificationDocuments.length > 0" class="overflow-x-auto rounded-md border border-neutral-200 dark:border-dark-border">
             <table class="table w-full">
               <thead>
                 <tr>
@@ -177,7 +124,11 @@
                     </span>
                   </td>
                   <td>
-                    <button class="btn-outline btn-small">
+                    <button class="btn-outline btn-small flex items-center">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                      </svg>
                       View
                     </button>
                   </td>
@@ -190,38 +141,47 @@
 
       <!-- Verification Status Section -->
       <div class="lg:col-span-1">
-        <div class="card">
-          <h2 class="text-xl font-semibold mb-4">Verification Status</h2>
-
-          <div class="mb-6 p-4 rounded-md" [ngClass]="getStatusClass(enterprise.status) + ' bg-opacity-10'">
-            <div class="flex items-center mb-2">
-              <svg *ngIf="enterprise.status === 'VERIFIED'" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              <svg *ngIf="enterprise.status === 'PENDING'" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-yellow-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              <svg *ngIf="enterprise.status === 'REJECTED'" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              <span class="font-semibold">Current Status: {{ enterprise.status }}</span>
-            </div>
-
-            <p *ngIf="enterprise.status === 'VERIFIED' && enterprise.verifiedAt" class="text-sm">
-              Verified on {{ enterprise.verifiedAt | date:'medium' }}
-            </p>
-            <p *ngIf="enterprise.status === 'PENDING'" class="text-sm">
-              Verification in progress. Upload required documents to complete the process.
-            </p>
-            <p *ngIf="enterprise.status === 'REJECTED'" class="text-sm">
-              Verification rejected. Please review the requirements and resubmit.
-            </p>
+        <div class="card shadow-sm hover:shadow-md transition-shadow duration-300">
+          <div class="flex items-center mb-6">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-primary mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <h2 class="text-xl font-semibold">Verification Status</h2>
           </div>
 
+          <!-- Current Status Card -->
+          <div class="mb-6 p-5 rounded-md border" [ngClass]="[getStatusClass(enterprise.status) + '-border', 'bg-opacity-5', getStatusClass(enterprise.status)]">
+            <div class="flex items-center mb-3">
+              <!-- Status Icons -->
+              <svg *ngIf="enterprise.status === 'VERIFIED'" xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 mr-3 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <svg *ngIf="enterprise.status === 'PENDING'" xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 mr-3 text-yellow-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <svg *ngIf="enterprise.status === 'REJECTED'" xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 mr-3 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <svg *ngIf="enterprise.status === 'UNDER_REVIEW'" xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 mr-3 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+
+              <div>
+                <h3 class="font-medium text-lg">{{ enterprise.status }}</h3>
+                <p *ngIf="enterprise.status === 'VERIFIED' && enterprise.verifiedAt" class="text-sm text-neutral-600 dark:text-neutral-400">
+                  Verified on {{ enterprise.verifiedAt | date:'medium' }}
+                </p>
+              </div>
+            </div>
+
+           </div>
+
           <!-- Update Status Form -->
-          <form (ngSubmit)="updateVerificationStatus()" class="space-y-4">
+          <form (ngSubmit)="updateVerificationStatus()" class="space-y-4 bg-neutral-50 dark:bg-dark-surface p-4 rounded-md">
+            <h3 class="font-medium">Update Status</h3>
+
             <div class="form-group">
-              <label for="newStatus" class="form-label">Change Status</label>
+              <label for="newStatus" class="form-label">New Status</label>
               <select
                 id="newStatus"
                 [(ngModel)]="statusUpdateRequest.newStatus"
@@ -247,45 +207,57 @@
             <div class="flex justify-end">
               <button
                 type="submit"
-                class="btn-primary"
+                class="btn-primary flex items-center"
                 [disabled]="isUpdatingStatus || !statusUpdateRequest.reason"
               >
-                <span *ngIf="isUpdatingStatus" class="inline-block animate-spin mr-2">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                  </svg>
-                </span>
+                <svg *ngIf="isUpdatingStatus" class="animate-spin h-5 w-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
                 Update Status
               </button>
             </div>
           </form>
 
-          <!-- Verification Requirements -->
-          <div class="mt-6 pt-6 border-t border-neutral-200 dark:border-dark-border">
-            <h3 class="font-medium mb-2">Verification Requirements</h3>
-            <ul class="text-sm space-y-2">
+          <!-- Verification Requirements - Improved presentation -->
+          <div class="mt-6 pt-4 border-t border-neutral-200 dark:border-dark-border">
+            <h3 class="font-medium mb-3 flex items-center">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+              </svg>
+              Verification Requirements
+            </h3>
+            <ul class="text-sm space-y-3">
               <li class="flex items-start">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-green-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                </svg>
+                <div class="flex-shrink-0 h-5 w-5 rounded-full bg-green-100 flex items-center justify-center mr-2">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
+                  </svg>
+                </div>
                 <span>Valid business license</span>
               </li>
               <li class="flex items-start">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-green-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                </svg>
+                <div class="flex-shrink-0 h-5 w-5 rounded-full bg-green-100 flex items-center justify-center mr-2">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
+                  </svg>
+                </div>
                 <span>Tax registration certificate</span>
               </li>
               <li class="flex items-start">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-green-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                </svg>
+                <div class="flex-shrink-0 h-5 w-5 rounded-full bg-green-100 flex items-center justify-center mr-2">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
+                  </svg>
+                </div>
                 <span>Proof of address</span>
               </li>
               <li class="flex items-start">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-yellow-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                </svg>
+                <div class="flex-shrink-0 h-5 w-5 rounded-full bg-yellow-100 flex items-center justify-center mr-2">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 text-yellow-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 9v2m0 4h.01" />
+                  </svg>
+                </div>
                 <span>ID proof of authorized representative</span>
               </li>
             </ul>

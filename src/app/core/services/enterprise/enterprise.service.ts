@@ -18,10 +18,12 @@ export class EnterpriseService {
     return this.http.post<EnterpriseResponse>(this.apiUrl, enterpriseRequest);
   }
 
+ getEnterpriseOfUser(): Observable<EnterpriseResponse> {
+   return this.http.get<EnterpriseResponse>(`${this.apiUrl}/user`);
+ }
 
-  getById(id: number): Observable<EnterpriseResponse> {
-    return this.http.get<EnterpriseResponse>(`${this.apiUrl}/${id}`);
-  }
+
+
 
 
   update(id: number, enterpriseRequest: EnterpriseRequest): Observable<EnterpriseResponse> {
@@ -33,7 +35,9 @@ export class EnterpriseService {
     return this.http.delete<void>(`${this.apiUrl}/${id}`);
   }
 
-
+  getById(id: number): Observable<EnterpriseResponse> {
+    return this.http.get<EnterpriseResponse>(`${this.apiUrl}/${id}`);
+  }
 
   getAll(page: number = 0, size: number = 10, sort?: string): Observable<any> {
     let params = new HttpParams()

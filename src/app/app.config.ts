@@ -5,6 +5,7 @@ import { provideToastr } from 'ngx-toastr';
 import { routes } from './app.routes';
 import {errorInterceptor} from './core/interceptors/error.interceptor';
 import {authInterceptor} from './core/interceptors/auth.interceptor';
+import {provideAnimations} from '@angular/platform-browser/animations';
 
 
 export const appConfig: ApplicationConfig = {
@@ -14,8 +15,9 @@ export const appConfig: ApplicationConfig = {
     provideHttpClient(
       withInterceptors([errorInterceptor,authInterceptor])
     ),
+    provideAnimations(),
     provideToastr({
-      timeOut: 5000,
+      timeOut: 2000,
       positionClass: 'toast-top-right',
       preventDuplicates: true,
     })

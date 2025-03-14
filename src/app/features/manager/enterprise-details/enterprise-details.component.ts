@@ -1,14 +1,14 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { Subject, takeUntil } from 'rxjs';
 
 import { EnterpriseService } from '../../../core/services/enterprise/enterprise.service';
 import { EnterpriseVerificationService } from '../../../core/services/enterprise-verification/enterprise-verification.service';
 import { ToastService } from '../../../core/services/toast/toast.service';
 import {
+  EnterpriseRequest,
   EnterpriseResponse,
   EnterpriseType,
   VerificationStatus
@@ -25,22 +25,26 @@ import {
   templateUrl: './enterprise-details.component.html',
   styleUrls: ['./enterprise-details.component.css']
 })
-export class EnterpriseDetailsComponent implements OnInit, OnDestroy {
-  // Cleanup subject
-  private destroy$ = new Subject<void>();
+export class EnterpriseDetailsComponent implements OnInit {
+  private fb = inject(FormBuilder);
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+  private enterpriseService = inject(EnterpriseService);
+  private verificationService = inject(EnterpriseVerificationService);
+  private toastService = inject(ToastService);
 
-  // Enterprise data
+
   enterpriseId!: number;
-  enterprise!: EnterpriseResponse;
+  enterprise?: EnterpriseResponse;
   verificationDocuments: VerificationDocumentResponse[] = [];
 
-  // UI state
-  isLoading = false;
-  isUpdatingStatus = false;
-  errorMessage: string | null = null;
-  successMessage: string | null = null;
 
-  // Form declarations
+  isLoading = false;
+  isSubmitting = false;
+  isUploadingDocument = false;
+  isUpdatingStatus = false;
+
+
   enterpriseForm!: FormGroup;
   statusUpdateRequest: VerificationStatusUpdateRequest = {
     enterpriseId: 0,
@@ -48,27 +52,21 @@ export class EnterpriseDetailsComponent implements OnInit, OnDestroy {
     reason: ''
   };
 
-  // Constants and lookups
+
   enterpriseTypes = Object.values(EnterpriseType);
-  verificationStatuses = Object.values(VerificationStatus);
   documentTypes = ['BUSINESS_LICENSE', 'TAX_CERTIFICATE', 'ID_PROOF', 'ADDRESS_PROOF', 'OTHER'];
 
-  constructor(
-    private fb: FormBuilder,
-    private route: ActivatedRoute,
-    private router: Router,
-    private enterpriseService: EnterpriseService,
-    private verificationService: EnterpriseVerificationService,
-    private toastService: ToastService
-  ) {
+
+  selectedFile?: File;
+  selectedDocumentType = this.documentTypes[0];
+
+  constructor() {
     this.initializeForm();
   }
 
   ngOnInit(): void {
-    // Get ID from route params
-    const idParam = this.route.snapshot.paramMap.get('id');
-    if (idParam) {
-      this.enterpriseId = +idParam;
+    this.enterpriseId = +this.route.snapshot.paramMap.get('id')!;
+    if (this.enterpriseId) {
       this.loadEnterpriseData();
     } else {
       this.toastService.error('Enterprise ID is required');
@@ -76,10 +74,6 @@ export class EnterpriseDetailsComponent implements OnInit, OnDestroy {
     }
   }
 
-  ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
-  }
 
   private initializeForm(): void {
     this.enterpriseForm = this.fb.group({
@@ -92,33 +86,26 @@ export class EnterpriseDetailsComponent implements OnInit, OnDestroy {
     });
   }
 
+
   loadEnterpriseData(): void {
     this.isLoading = true;
-    this.errorMessage = null;
 
     this.enterpriseService.getById(this.enterpriseId)
-      .pipe(takeUntil(this.destroy$))
       .subscribe({
-        next: (data) => {
-          // Update enterprise data
-          this.enterprise = data;
-
-          // Pre-populate form
+        next: (enterprise) => {
+          this.enterprise = enterprise;
           this.enterpriseForm.patchValue({
-            name: data.name,
-            registrationNumber: data.registrationNumber,
-            enterpriseType: data.type
+            name: enterprise.name,
+            registrationNumber: enterprise.registrationNumber,
+            enterpriseType: enterprise.type
           });
 
-          // Setup status update request
-          this.statusUpdateRequest.enterpriseId = data.id;
-          this.statusUpdateRequest.newStatus = data.status;
+          this.statusUpdateRequest.enterpriseId = enterprise.id;
+          this.statusUpdateRequest.newStatus = enterprise.status;
 
-          // Load documents next
           this.loadVerificationDocuments();
         },
         error: (error) => {
-          this.errorMessage = 'Failed to load enterprise details';
           this.toastService.error('Failed to load enterprise details');
           console.error('Error loading enterprise', error);
           this.isLoading = false;
@@ -126,9 +113,9 @@ export class EnterpriseDetailsComponent implements OnInit, OnDestroy {
       });
   }
 
+
   loadVerificationDocuments(): void {
     this.verificationService.getDocuments(this.enterpriseId)
-      .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (documents) => {
           this.verificationDocuments = documents;
@@ -142,29 +129,44 @@ export class EnterpriseDetailsComponent implements OnInit, OnDestroy {
       });
   }
 
-  updateVerificationStatus(): void {
-    if (!this.statusUpdateRequest.reason) {
-      this.toastService.error('Please provide a reason for the status change');
+
+  saveEnterpriseDetails(): void {
+    if (this.enterpriseForm.invalid) {
+      this.markFormGroupTouched(this.enterpriseForm);
       return;
     }
 
-    this.isUpdatingStatus = true;
-    this.errorMessage = null;
+    this.isSubmitting = true;
+    const enterpriseRequest: EnterpriseRequest = this.enterpriseForm.value;
 
-    // Ensure enterprise ID is set correctly
+    this.enterpriseService.update(this.enterpriseId, enterpriseRequest)
+      .subscribe({
+        next: (response) => {
+          this.enterprise = response;
+          this.toastService.success('Enterprise details updated successfully');
+          this.isSubmitting = false;
+        },
+        error: (error) => {
+          this.toastService.error('Failed to update enterprise details');
+          console.error('Error updating enterprise', error);
+          this.isSubmitting = false;
+        }
+      });
+  }
+
+
+  updateVerificationStatus(): void {
+    this.isUpdatingStatus = true;
     this.statusUpdateRequest.enterpriseId = this.enterpriseId;
 
     this.enterpriseService.updateVerificationStatus(this.statusUpdateRequest)
-      .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: () => {
           this.toastService.success(`Verification status updated to ${this.statusUpdateRequest.newStatus}`);
-          this.successMessage = `Status successfully updated to ${this.statusUpdateRequest.newStatus}`;
           this.loadEnterpriseData();
           this.isUpdatingStatus = false;
         },
         error: (error) => {
-          this.errorMessage = 'Failed to update verification status';
           this.toastService.error('Failed to update verification status');
           console.error('Error updating status', error);
           this.isUpdatingStatus = false;
@@ -172,9 +174,52 @@ export class EnterpriseDetailsComponent implements OnInit, OnDestroy {
       });
   }
 
-  /**
-   * Returns the appropriate CSS class for a verification status
-   */
+
+  onFileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files.length > 0) {
+      this.selectedFile = input.files[0];
+    }
+  }
+
+
+  uploadDocument(): void {
+    if (!this.selectedFile || !this.selectedDocumentType) {
+      this.toastService.error('Please select a file and document type');
+      return;
+    }
+
+    this.isUploadingDocument = true;
+
+    const documentRequest = {
+      enterpriseId: this.enterpriseId,
+      documentType: this.selectedDocumentType,
+      file: this.selectedFile
+    };
+
+    this.verificationService.uploadDocument(documentRequest)
+      .subscribe({
+        next: (response) => {
+          this.verificationDocuments.push(response);
+          this.toastService.success('Document uploaded successfully');
+          this.selectedFile = undefined;
+          this.isUploadingDocument = false;
+
+          // Reset the file input
+          const fileInput = document.getElementById('document-file') as HTMLInputElement;
+          if (fileInput) {
+            fileInput.value = '';
+          }
+        },
+        error: (error) => {
+          this.toastService.error('Failed to upload document');
+          console.error('Error uploading document', error);
+          this.isUploadingDocument = false;
+        }
+      });
+  }
+
+
   getStatusClass(status: VerificationStatus): string {
     switch (status) {
       case VerificationStatus.VERIFIED:
@@ -183,17 +228,23 @@ export class EnterpriseDetailsComponent implements OnInit, OnDestroy {
         return 'badge-yellow';
       case VerificationStatus.REJECTED:
         return 'badge-red';
-      case VerificationStatus.UNDER_REVIEW:
-        return 'badge-blue';
       default:
         return 'badge-gray';
     }
   }
 
-  /**
-   * Navigate back to the enterprises list
-   */
+
   goBack(): void {
     this.router.navigate(['/admin/enterprises']);
+  }
+
+
+  private markFormGroupTouched(formGroup: FormGroup) {
+    Object.values(formGroup.controls).forEach(control => {
+      control.markAsTouched();
+      if ((control as any).controls) {
+        this.markFormGroupTouched(control as FormGroup);
+      }
+    });
   }
 }

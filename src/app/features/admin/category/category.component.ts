@@ -47,7 +47,7 @@ export class CategoryComponent implements OnInit {
   totalItems = 0;
   totalPages = 0;
 
-  // Filtering and Sorting
+
   searchTerm = '';
   statusFilter = 'all';
   sortOrder = 'name,asc';
@@ -352,11 +352,7 @@ export class CategoryComponent implements OnInit {
     } else {
       this.toastService.error(message);
     }
-
-
-    setTimeout(() => {
-      this.clearNotification();
-    }, 5000);
+    ;
   }
 
 

@@ -4,6 +4,9 @@ import {CategoryListComponent} from './shared/components/category-list/category-
 import {LocationListComponent} from './features/manager/location-list/location-list.component';
 import {MaterialComponent} from './features/manager/material/material.component';
 import {MaterialListComponent} from './features/manager/material-list/material-list.component';
+import {
+  EnterpriseDetailsComponent
+} from './features/manager/enterprise-details/enterprise-details.component';
 
 export const routes: Routes = [
     {
@@ -50,6 +53,11 @@ export const routes: Routes = [
   {
    path: 'categoryList',
     loadComponent: () => import('./features/manager/location-list/location-list.component').then(m => m.LocationListComponent),
+
+  },
+   {
+   path: 'mamagemetentroprs/:id',
+    loadComponent: () => import('./features/manager/enterprise-details/enterprise-details.component').then(m => m.EnterpriseDetailsComponent),
 
   },
    {
