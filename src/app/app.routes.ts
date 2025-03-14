@@ -7,6 +7,7 @@ import {MaterialListComponent} from './features/manager/material-list/material-l
 import {
   EnterpriseDetailsComponent
 } from './features/manager/enterprise-details/enterprise-details.component';
+import {EnterpriseFormComponent} from './features/manager/enterprise-form/enterprise-form.component';
 
 export const routes: Routes = [
     {
@@ -56,8 +57,13 @@ export const routes: Routes = [
 
   },
    {
-   path: 'mamagemetentroprs/:id',
+   path: 'mamagemetentroprs',
     loadComponent: () => import('./features/manager/enterprise-details/enterprise-details.component').then(m => m.EnterpriseDetailsComponent),
+
+  },
+    {
+   path: 'entreprises/new',
+    loadComponent: () => import('./features/manager/enterprise-form/enterprise-form.component').then(m => m.EnterpriseFormComponent),
 
   },
    {

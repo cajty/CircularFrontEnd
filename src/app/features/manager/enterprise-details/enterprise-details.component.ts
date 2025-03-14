@@ -65,13 +65,7 @@ export class EnterpriseDetailsComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.enterpriseId = +this.route.snapshot.paramMap.get('id')!;
-    if (this.enterpriseId) {
       this.loadEnterpriseData();
-    } else {
-      this.toastService.error('Enterprise ID is required');
-      this.router.navigate(['/admin/enterprises']);
-    }
   }
 
 
@@ -90,7 +84,7 @@ export class EnterpriseDetailsComponent implements OnInit {
   loadEnterpriseData(): void {
     this.isLoading = true;
 
-    this.enterpriseService.getById(this.enterpriseId)
+    this.enterpriseService.getEnterpriseOfUser()
       .subscribe({
         next: (enterprise) => {
           this.enterprise = enterprise;

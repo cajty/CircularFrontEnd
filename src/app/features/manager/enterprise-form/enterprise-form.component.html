@@ -1,0 +1,101 @@
+<div class="container mx-auto px-4 py-8">
+  <div class="max-w-2xl mx-auto bg-white dark:bg-dark-surface rounded-lg shadow-lg p-6">
+    <h2 class="text-2xl font-bold mb-6 text-center text-neutral-900 dark:text-dark-text">
+      Register Your Enterprise
+    </h2>
+
+    <form [formGroup]="enterpriseForm" (ngSubmit)="onSubmit()" class="space-y-6">
+      <!-- Enterprise Name -->
+      <div class="form-group">
+        <label for="name" class="form-label">Enterprise Name</label>
+        <input
+          type="text"
+          id="name"
+          formControlName="name"
+          class="form-input"
+          [ngClass]="{'border-error': formControls['name'].invalid && formControls['name'].touched}"
+          placeholder="Enter your enterprise name"
+        >
+        <div *ngIf="formControls['name'].invalid && formControls['name'].touched" class="form-error">
+          <span *ngIf="formControls['name'].errors?.['required']">Enterprise name is required</span>
+          <span *ngIf="formControls['name'].errors?.['minlength']">Name must be at least 3 characters</span>
+          <span *ngIf="formControls['name'].errors?.['maxlength']">Name cannot exceed 100 characters</span>
+        </div>
+      </div>
+
+      <!-- Registration Number -->
+      <div class="form-group">
+        <label for="registrationNumber" class="form-label">Registration Number</label>
+        <input
+          type="text"
+          id="registrationNumber"
+          formControlName="registrationNumber"
+          class="form-input"
+          [ngClass]="{'border-error': formControls['registrationNumber'].invalid && formControls['registrationNumber'].touched}"
+          placeholder="Enter registration number"
+        >
+        <div *ngIf="formControls['registrationNumber'].invalid && formControls['registrationNumber'].touched" class="form-error">
+          <span *ngIf="formControls['registrationNumber'].errors?.['required']">Registration number is required</span>
+          <span *ngIf="formControls['registrationNumber'].errors?.['pattern']">
+            Must be 5-15 alphanumeric characters
+          </span>
+        </div>
+      </div>
+
+      <!-- Enterprise Type Selection -->
+      <div class="form-group">
+        <label class="form-label">Select Enterprise Type</label>
+        <div class="grid grid-cols-3 gap-4">
+          <div
+            *ngFor="let type of enterpriseTypes"
+            class="cursor-pointer"
+            (click)="formControls['enterpriseType'].setValue(type)"
+          >
+            <div
+              class="border rounded-lg p-4 transition-all duration-300 flex flex-col items-center space-y-2"
+              [ngClass]="{
+                'border-primary bg-primary bg-opacity-10': formControls['enterpriseType'].value === type,
+                'border-neutral-300 dark:border-dark-border hover:border-neutral-400': formControls['enterpriseType'].value !== type
+              }"
+            >
+              <div
+                class="w-12 h-12 flex items-center justify-center"
+                [ngClass]="{
+                  'text-primary': formControls['enterpriseType'].value === type,
+                  'text-neutral-500': formControls['enterpriseType'].value !== type
+                }"
+                [innerHTML]="enterpriseTypeIcons[type]"
+              ></div>
+              <span
+                class="text-sm font-medium"
+                [ngClass]="{
+                  'text-primary': formControls['enterpriseType'].value === type,
+                  'text-neutral-700 dark:text-dark-text': formControls['enterpriseType'].value !== type
+                }"
+              >
+                {{ type }}
+              </span>
+            </div>
+          </div>
+        </div>
+        <div
+          *ngIf="formControls['enterpriseType'].invalid && formControls['enterpriseType'].touched"
+          class="form-error mt-2"
+        >
+          Please select an enterprise type
+        </div>
+      </div>
+
+      <!-- Submit Button -->
+      <div class="pt-4">
+        <button
+          type="submit"
+          class="btn-primary w-full"
+          [disabled]="enterpriseForm.invalid"
+        >
+          Register Enterprise
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
