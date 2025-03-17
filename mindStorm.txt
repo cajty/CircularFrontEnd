@@ -13,3 +13,7 @@ this is for i take may breakfast
 --frontend
 1. that chalnge in that part of resgenter for enter and for user
 2. that part of login i have to make better and
+
+
+
+---- win transaction secseful that user location of that martrill will change to that user location

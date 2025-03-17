@@ -1,6 +1,7 @@
-import { Component, OnInit } from '@angular/core';
-import { RouterLink, RouterLinkActive } from '@angular/router';
+import { Component, OnInit, inject } from '@angular/core';
+import { RouterLink, RouterLinkActive, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import {AuthService} from '../../../core/services/auth/auth.service';
 
 
 @Component({
@@ -13,6 +14,9 @@ import { CommonModule } from '@angular/common';
 export class HeaderComponent implements OnInit {
   isMenuOpen = false;
   isDarkMode = false;
+
+  private authService = inject(AuthService);
+  private router = inject(Router);
 
   constructor() {}
 
@@ -29,12 +33,13 @@ export class HeaderComponent implements OnInit {
   }
 
   logout() {
-
+    this.authService.logout();
+    this.router.navigate(['/login']);
     this.isMenuOpen = false;
   }
 
   isLoggedIn() {
-    return false;
+    return this.authService.isLoggedIn();
   }
 
   toggleDarkMode() {

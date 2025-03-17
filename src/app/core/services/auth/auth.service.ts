@@ -9,10 +9,8 @@ import { ToastService } from '../toast/toast.service';
 
 export interface RegisterRequest {
   email: string;
+  name: string;
   password: string;
-  firstName?: string;
-  lastName?: string;
-
 }
 
 export interface LoginRequest {

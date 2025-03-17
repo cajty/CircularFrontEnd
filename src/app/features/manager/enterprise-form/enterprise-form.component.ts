@@ -89,7 +89,7 @@ export class EnterpriseFormComponent implements OnInit {
 
     const enterpriseRequest: EnterpriseRequest = this.enterpriseForm.value;
 
-    // Determine if this is create or update based on existing enterprise
+
     this.enterpriseService.create(enterpriseRequest)
       .subscribe({
         next: (response) => {
@@ -114,7 +114,6 @@ export class EnterpriseFormComponent implements OnInit {
     });
   }
 
-  // Getter for easy form control access in template
   get formControls() {
     return this.enterpriseForm.controls;
   }

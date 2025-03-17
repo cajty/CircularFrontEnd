@@ -1,0 +1,36 @@
+/* Animation for alerts */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.alert-success, .alert-error {
+  animation: fadeIn 0.3s ease-out;
+}
+
+/* Focus styles */
+.form-input:focus {
+  @apply ring-2 ring-primary;
+}
+
+/* Smooth transitions */
+.form-input, .btn-primary {
+  transition: all 0.2s ease-in-out;
+}
+
+/* Make validation messages stand out */
+.form-error {
+  @apply text-sm text-error mt-1;
+  animation: fadeIn 0.2s ease-out;
+}
+
+/* Custom styles for password requirements list */
+.form-error ul {
+  margin-top: 0.25rem;
+  margin-bottom: 0.25rem;
+}
+
+.form-error ul li {
+  margin-left: 1rem;
+  font-size: 0.75rem;
+}

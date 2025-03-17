@@ -1,4 +1,5 @@
-import { Component, Input, OnInit } from '@angular/core';
+// src/app/shared/components/sidebar/sidebar.component.ts
+import { Component, Input, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { DomSanitizer, SafeValue } from '@angular/platform-browser';
@@ -22,13 +23,19 @@ interface SidebarCategory {
   selector: 'app-sidebar',
   standalone: true,
   imports: [CommonModule, RouterModule],
-  templateUrl: './sidebar.component.html'
+  templateUrl: './sidebar.component.html',
+  styleUrls: ['./sidebar.component.css']
 })
 export class SidebarComponent implements OnInit {
-  @Input() username: string = 'John Doe';
-  @Input() userRole: string = 'Enterprise Admin';
+  // Use signals for better reactivity
+  @Input() username = 'John Doe';
+  @Input() userRole = 'Enterprise Admin';
+  @Input() companyName = 'Circular Inc.';
 
-  isDrawerOpen: boolean = true;
+  // Convert to signal for reactive state management
+  isDrawerOpen = signal<boolean>(true);
+
+  private sanitizer = inject(DomSanitizer);
 
   categories: SidebarCategory[] = [
     {
@@ -61,16 +68,19 @@ export class SidebarComponent implements OnInit {
     }
   ];
 
-  constructor(private sanitizer: DomSanitizer) {}
-
   ngOnInit() {
     const savedState = localStorage.getItem('sidebarOpen');
-    this.isDrawerOpen = savedState ? savedState === 'true' : true;
+    this.isDrawerOpen.set(savedState ? savedState === 'true' : true);
   }
 
   toggleDrawer() {
-    this.isDrawerOpen = !this.isDrawerOpen;
-    localStorage.setItem('sidebarOpen', this.isDrawerOpen.toString());
+    // Update signal using update method
+    this.isDrawerOpen.update(isOpen => !isOpen);
+    localStorage.setItem('sidebarOpen', this.isDrawerOpen().toString());
+  }
+
+  getInitials(): string {
+    return this.username.charAt(0).toUpperCase();
   }
 
   getIconPath(icon: string): SafeValue {

@@ -1,0 +1,151 @@
+<div class="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+  <div class="max-w-md w-full space-y-8">
+    <div class="text-center">
+      <h2 class="mt-6 text-3xl font-extrabold text-neutral-900 dark:text-white">
+        Create your account
+      </h2>
+      <p class="mt-2 text-sm text-neutral-600 dark:text-neutral-400">
+        Already have an account?
+        <a routerLink="/login" class="font-medium text-primary hover:text-primary-dark">
+          Sign in here
+        </a>
+      </p>
+    </div>
+
+    <!-- Success Message -->
+    <div *ngIf="successMessage" class="alert-success">
+      <div class="flex items-center">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+        </svg>
+        {{ successMessage }}
+      </div>
+    </div>
+
+    <!-- Error Message -->
+    <div *ngIf="errorMessage" class="alert-error">
+      <div class="flex items-center">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        {{ errorMessage }}
+      </div>
+    </div>
+
+    <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="mt-8 space-y-6">
+      <div class="rounded-md shadow-sm space-y-4">
+        <!-- Name input -->
+        <div>
+          <label for="name" class="form-label">Full Name</label>
+          <input
+            id="name"
+            formControlName="name"
+            type="text"
+            required
+            class="form-input"
+            [ngClass]="{'border-error': registerForm.get('name')?.invalid && registerForm.get('name')?.touched}"
+            placeholder="Enter your name"
+          />
+          <div *ngIf="registerForm.get('name')?.invalid && registerForm.get('name')?.touched" class="form-error">
+            <span *ngIf="registerForm.get('name')?.errors?.['required']">Name is required</span>
+            <span *ngIf="registerForm.get('name')?.errors?.['minlength']">Name must be at least 3 characters</span>
+          </div>
+        </div>
+
+        <!-- Email input -->
+        <div>
+          <label for="email" class="form-label">Email address</label>
+          <input
+            id="email"
+            formControlName="email"
+            type="email"
+            autocomplete="email"
+            required
+            class="form-input"
+            [ngClass]="{'border-error': registerForm.get('email')?.invalid && registerForm.get('email')?.touched}"
+            placeholder="Email address"
+          />
+          <div *ngIf="registerForm.get('email')?.invalid && registerForm.get('email')?.touched" class="form-error">
+            <span *ngIf="registerForm.get('email')?.errors?.['required']">Email is required</span>
+            <span *ngIf="registerForm.get('email')?.errors?.['email']">Please enter a valid email</span>
+          </div>
+        </div>
+
+        <!-- Password input -->
+        <div>
+          <label for="password" class="form-label">Password</label>
+          <input
+            id="password"
+            formControlName="password"
+            type="password"
+            autocomplete="new-password"
+            required
+            class="form-input"
+            [ngClass]="{'border-error': registerForm.get('password')?.invalid && registerForm.get('password')?.touched}"
+            placeholder="Create a password"
+          />
+          <div *ngIf="registerForm.get('password')?.invalid && registerForm.get('password')?.touched" class="form-error">
+            <div *ngIf="registerForm.get('password')?.errors?.['required']">Password is required</div>
+            <div *ngIf="registerForm.get('password')?.errors?.['minlength']">Password must be at least 8 characters</div>
+            <div *ngIf="registerForm.get('password')?.errors?.['pattern']">
+              Password must contain at least:
+              <ul class="list-disc pl-5 mt-1">
+                <li>One uppercase letter</li>
+                <li>One lowercase letter</li>
+                <li>One number</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- Confirm Password input -->
+        <div>
+          <label for="confirmPassword" class="form-label">Confirm Password</label>
+          <input
+            id="confirmPassword"
+            formControlName="confirmPassword"
+            type="password"
+            autocomplete="new-password"
+            required
+            class="form-input"
+            [ngClass]="{'border-error': registerForm.get('confirmPassword')?.invalid && registerForm.get('confirmPassword')?.touched}"
+            placeholder="Confirm your password"
+          />
+          <div *ngIf="registerForm.get('confirmPassword')?.invalid && registerForm.get('confirmPassword')?.touched" class="form-error">
+            <span *ngIf="registerForm.get('confirmPassword')?.errors?.['required']">Please confirm your password</span>
+            <span *ngIf="registerForm.get('confirmPassword')?.errors?.['passwordMismatch']">Passwords do not match</span>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <button
+          type="submit"
+          [disabled]="isLoading || registerForm.invalid"
+          class="btn-primary w-full"
+          [ngClass]="{'opacity-70 cursor-not-allowed': isLoading || registerForm.invalid}"
+        >
+          <div *ngIf="isLoading" class="flex justify-center items-center">
+            <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            Registering...
+          </div>
+          <span *ngIf="!isLoading">Create Account</span>
+        </button>
+      </div>
+
+      <div class="text-center text-sm text-neutral-600 dark:text-neutral-400">
+        By signing up, you agree to our
+        <a routerLink="/terms" class="font-medium text-primary hover:text-primary-dark">
+          Terms of Service
+        </a>
+        and
+        <a routerLink="/privacy" class="font-medium text-primary hover:text-primary-dark">
+          Privacy Policy
+        </a>
+      </div>
+    </form>
+  </div>
+</div>

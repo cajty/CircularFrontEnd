@@ -1,0 +1,34 @@
+<div class="flex flex-col items-center justify-center min-h-screen bg-neutral-100 dark:bg-dark-bg px-4 py-12">
+  <div class="text-center">
+    <h1 class="text-9xl font-bold text-primary">404</h1>
+
+    <div class="mt-4 mb-8">
+      <h2 class="text-3xl font-semibold text-neutral-900 dark:text-dark-text mb-2">Page Not Found</h2>
+      <p class="text-neutral-600 dark:text-neutral-400">The page you are looking for doesn't exist or has been moved.</p>
+    </div>
+
+    <div class="max-w-md mx-auto p-6 bg-white dark:bg-dark-surface rounded-lg shadow-lg border border-neutral-200 dark:border-dark-border mb-8">
+      <p class="text-neutral-700 dark:text-neutral-300 mb-4">You might want to check if you've mistyped the address or go back to the homepage.</p>
+
+      <div class="flex flex-col sm:flex-row justify-center gap-4">
+        <button
+          class="btn-primary"
+          (click)="goBack()">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+          </svg>
+          Go Back
+        </button>
+
+        <a
+          routerLink="/"
+          class="btn-outline inline-flex items-center justify-center">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+          </svg>
+          Home Page
+        </a>
+      </div>
+    </div>
+  </div>
+</div>

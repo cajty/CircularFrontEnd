@@ -9,8 +9,8 @@
         </a>
       </div>
 
-      <!-- Center Navigation -->
-      <nav class="hidden md:flex items-center space-x-4">
+      <!-- Center Navigation - Only show when logged in -->
+      <nav *ngIf="isLoggedIn()" class="hidden md:flex items-center space-x-4">
         <a [routerLink]="'/dashboard'" routerLinkActive="text-primary"
            class="px-3 py-2 text-neutral-200 hover:text-white text-sm font-medium transition-colors duration-150">
           Dashboard
@@ -41,8 +41,8 @@
           </svg>
         </button>
 
-        <!-- User Profile -->
-        <div class="relative">
+        <!-- User Profile - Only show when logged in -->
+        <div *ngIf="isLoggedIn()" class="relative">
           <button (click)="toggleMenu()" class="flex items-center space-x-1">
             <div class="h-8 w-8 rounded-full bg-primary text-white flex items-center justify-center font-medium">
               U
@@ -67,8 +67,13 @@
           </div>
         </div>
 
-        <!-- Mobile menu toggle -->
-        <button (click)="toggleMenu()" class="md:hidden text-neutral-300 hover:text-white">
+        <!-- Login Button - Only show when not logged in -->
+        <a *ngIf="!isLoggedIn()" [routerLink]="'/login'" class="text-neutral-200 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors duration-150 hover:bg-neutral-700">
+          Login
+        </a>
+
+        <!-- Mobile menu toggle - Only show when logged in -->
+        <button *ngIf="isLoggedIn()" (click)="toggleMenu()" class="md:hidden text-neutral-300 hover:text-white">
           <svg *ngIf="!isMenuOpen" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
           </svg>
@@ -80,8 +85,8 @@
     </div>
   </div>
 
-  <!-- Mobile Navigation Menu -->
-  <div *ngIf="isMenuOpen" class="md:hidden py-3 border-t border-neutral-700 bg-secondary animate-fade-in-up">
+  <!-- Mobile Navigation Menu - Only show when logged in -->
+  <div *ngIf="isMenuOpen && isLoggedIn()" class="md:hidden py-3 border-t border-neutral-700 bg-secondary animate-fade-in-up">
     <nav class="container mx-auto px-4">
       <ul class="space-y-1">
         <li><a [routerLink]="'/dashboard'" routerLinkActive="bg-neutral-700" class="block py-2 px-3 rounded-md text-white hover:bg-neutral-700 transition-colors duration-150" (click)="isMenuOpen = false">Dashboard</a></li>
