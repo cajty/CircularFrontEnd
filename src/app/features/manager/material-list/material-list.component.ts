@@ -110,18 +110,18 @@ export class MaterialListComponent implements OnInit {
   }
 
   viewMaterial(id: number): void {
-    this.router.navigate(['/materials', id]);
+    this.router.navigate(['/manager/materials', id]);
   }
 
   createMaterial(): void {
-    this.router.navigate(['/materials/new']);
+    this.router.navigate(['/manager/materials/new']);
   }
 
   retry(): void {
     this.loadMaterials();
   }
 
-  // Helper methods for template
+
   getSortIcon(field: string): string {
     if (field !== this.sortField) {
       return 'sort';

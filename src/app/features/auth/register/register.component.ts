@@ -5,7 +5,7 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { Router, RouterLink } from '@angular/router';
 
 import { finalize } from 'rxjs';
-import {AuthService, RegisterRequest} from '../../../../core/services/auth/auth.service';
+import {AuthService, RegisterRequest} from '../../../core/services/auth/auth.service';
 
 @Component({
   selector: 'app-register',

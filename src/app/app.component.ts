@@ -9,7 +9,7 @@ import { FooterComponent } from './shared/components/footer/footer.component';
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, RouterOutlet, SidebarComponent, HeaderComponent, FooterComponent],
+  imports: [CommonModule, RouterOutlet, HeaderComponent, FooterComponent],
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
 })
@@ -18,13 +18,11 @@ export class AppComponent implements OnInit {
   darkMode = false;
 
   ngOnInit() {
-    // Check for user's dark mode preference
     if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
       this.darkMode = true;
       document.documentElement.classList.add('dark');
     }
 
-    // Check for saved dark mode preference
     const savedDarkMode = localStorage.getItem('darkMode');
     if (savedDarkMode) {
       this.darkMode = savedDarkMode === 'true';
