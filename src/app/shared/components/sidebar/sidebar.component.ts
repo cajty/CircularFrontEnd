@@ -1,8 +1,8 @@
-// src/app/shared/components/sidebar/sidebar.component.ts
-import { Component, Input, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, OnDestroy, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { DomSanitizer, SafeValue } from '@angular/platform-browser';
+import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
+import { Subscription } from 'rxjs';
 
 interface SidebarLink {
   icon: string;
@@ -24,18 +24,15 @@ interface SidebarCategory {
   standalone: true,
   imports: [CommonModule, RouterModule],
   templateUrl: './sidebar.component.html',
-  styleUrls: ['./sidebar.component.css']
 })
-export class SidebarComponent implements OnInit {
-  // Use signals for better reactivity
-  @Input() username = 'John Doe';
-  @Input() userRole = 'Enterprise Admin';
-  @Input() companyName = 'Circular Inc.';
-
-  // Convert to signal for reactive state management
+export class SidebarComponent implements OnInit, OnDestroy {
   isDrawerOpen = signal<boolean>(true);
+  isMobile = false;
+  isCompletelyHidden = false;
+  private breakpointSubscription: Subscription | null = null;
 
-  private sanitizer = inject(DomSanitizer);
+  // Track open/closed state of each category
+  openCategories: {[key: string]: boolean} = {};
 
   categories: SidebarCategory[] = [
     {
@@ -68,22 +65,84 @@ export class SidebarComponent implements OnInit {
     }
   ];
 
+  constructor(private breakpointObserver: BreakpointObserver) {}
+
   ngOnInit() {
+    // Open first category by default
+    if (this.categories.length > 0) {
+      this.openCategories[this.categories[0].name] = true;
+    }
+
+    // Load saved sidebar states
     const savedState = localStorage.getItem('sidebarOpen');
     this.isDrawerOpen.set(savedState ? savedState === 'true' : true);
+
+    const savedHiddenState = localStorage.getItem('sidebarCompletelyHidden');
+    this.isCompletelyHidden = savedHiddenState ? savedHiddenState === 'true' : false;
+
+    // Try to load saved category states
+    try {
+      const savedCategoryStates = localStorage.getItem('sidebarCategoryStates');
+      if (savedCategoryStates) {
+        this.openCategories = JSON.parse(savedCategoryStates);
+      }
+    } catch (e) {
+      console.error('Error loading saved category states', e);
+    }
+
+    // Listen for screen size changes
+    this.breakpointSubscription = this.breakpointObserver
+      .observe([Breakpoints.HandsetPortrait, Breakpoints.TabletPortrait])
+      .subscribe(result => {
+        this.isMobile = result.matches;
+        // Auto-close drawer on mobile when first detected
+        if (this.isMobile && !localStorage.getItem('sidebarMobileState')) {
+          this.isDrawerOpen.set(false);
+        }
+      });
+  }
+
+  ngOnDestroy(): void {
+    if (this.breakpointSubscription) {
+      this.breakpointSubscription.unsubscribe();
+    }
   }
 
   toggleDrawer() {
-    // Update signal using update method
     this.isDrawerOpen.update(isOpen => !isOpen);
-    localStorage.setItem('sidebarOpen', this.isDrawerOpen().toString());
+    // Save state based on device type
+    if (this.isMobile) {
+      localStorage.setItem('sidebarMobileState', this.isDrawerOpen().toString());
+    } else {
+      localStorage.setItem('sidebarOpen', this.isDrawerOpen().toString());
+    }
   }
 
-  getInitials(): string {
-    return this.username.charAt(0).toUpperCase();
+  toggleCompletelyHidden() {
+    this.isCompletelyHidden = !this.isCompletelyHidden;
+    localStorage.setItem('sidebarCompletelyHidden', this.isCompletelyHidden.toString());
+
+    // If toggling to completely hidden, also close the drawer
+    if (this.isCompletelyHidden) {
+      this.isDrawerOpen.set(false);
+    }
   }
 
-  getIconPath(icon: string): SafeValue {
+  // New methods for category dropdown functionality
+  toggleCategory(categoryName: string) {
+    this.openCategories[categoryName] = !this.isCategoryOpen(categoryName);
+    this.saveCategoryStates();
+  }
+
+  isCategoryOpen(categoryName: string): boolean {
+    return this.openCategories[categoryName] === true;
+  }
+
+  saveCategoryStates() {
+    localStorage.setItem('sidebarCategoryStates', JSON.stringify(this.openCategories));
+  }
+
+  getIconPath(icon: string): string {
     const paths: { [key: string]: string } = {
       'dashboard': 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6',
       'store': 'M3 3h18v2H3zm0 8h18m-18 8h18M3 6h18v5a3 3 0 01-3 3H6a3 3 0 01-3-3z',
@@ -95,6 +154,6 @@ export class SidebarComponent implements OnInit {
       'transactions': 'M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4'
     };
 
-    return this.sanitizer.bypassSecurityTrustHtml(paths[icon] || '');
+    return paths[icon] || '';
   }
 }

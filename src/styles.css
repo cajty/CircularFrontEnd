@@ -2,7 +2,58 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+/* Custom Scrollbar Styling */
+@layer components {
+  /* Scrollbar track (background) */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
 
+  /* Scrollbar handle */
+  ::-webkit-scrollbar-thumb {
+    @apply bg-neutral-400 dark:bg-neutral-600 rounded-full;
+  }
+
+  /* Scrollbar handle on hover */
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-neutral-500 dark:bg-neutral-500;
+  }
+
+  /* Scrollbar track on hover */
+  ::-webkit-scrollbar-track {
+    @apply bg-neutral-200 dark:bg-neutral-800 rounded-full;
+  }
+
+  /* Scrollbar corner (where horizontal and vertical scrollbars meet) */
+  ::-webkit-scrollbar-corner {
+    @apply bg-transparent;
+  }
+
+  /* Sidebar specific scrollbar styling */
+  .sidebar-scroll {
+    scrollbar-width: thin; /* For Firefox */
+    scrollbar-color: theme('colors.neutral.600') theme('colors.neutral.800'); /* For Firefox */
+  }
+
+  .sidebar-scroll::-webkit-scrollbar {
+    width: 4px;
+  }
+
+  .sidebar-scroll::-webkit-scrollbar-thumb {
+    @apply bg-primary bg-opacity-70 rounded-full;
+    border-radius: 10px;
+  }
+
+  .sidebar-scroll::-webkit-scrollbar-thumb:hover {
+    @apply bg-primary;
+  }
+
+  .sidebar-scroll::-webkit-scrollbar-track {
+    @apply bg-neutral-800 bg-opacity-30 rounded-full;
+    margin: 10px 0;
+  }
+}
 @layer base {
   body {
     @apply bg-neutral-100 text-neutral-900 dark:bg-dark-bg dark:text-dark-text;
