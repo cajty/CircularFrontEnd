@@ -94,7 +94,10 @@ export class EnterpriseFormComponent implements OnInit {
       .subscribe({
         next: (response) => {
           this.toastService.success('Enterprise registered successfully');
-          this.router.navigate(['/dashboard']);
+          setTimeout(()=>
+              this.router.navigate(['/manager/enterprise-details']),
+           2000 )
+
         },
         error: (error) => {
           this.toastService.error('Failed to register enterprise');

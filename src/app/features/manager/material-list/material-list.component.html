@@ -1,9 +1,9 @@
-<div class="material-list-container p-4">
+<div class="material-list-container p-4 max-w-6xl mx-auto">
   <!-- Page Header -->
-  <div class="flex justify-between items-center mb-6">
-    <h1 class="text-2xl font-bold">Materials</h1>
-    <button class="btn btn-primary" (click)="createMaterial()">
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
+  <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+    <h1 class="text-2xl font-bold text-neutral-900 dark:text-dark-text">Materials</h1>
+    <button class="btn-primary flex items-center self-start sm:self-auto" (click)="createMaterial()">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
         <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
       </svg>
       Add Material
@@ -11,69 +11,83 @@
   </div>
 
   <!-- Search and Filters -->
-  <div class="bg-white dark:bg-neutral-800 rounded-lg shadow mb-6 p-4">
-    <form [formGroup]="searchForm" class="grid grid-cols-1 md:grid-cols-4 gap-4">
+  <div class="bg-white dark:bg-dark-surface rounded-lg shadow-card border border-neutral-200 dark:border-dark-border mb-6 p-4 transition-all duration-200">
+    <form [formGroup]="searchForm" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
       <!-- Name search -->
-      <div class="form-control">
-        <label class="label">
-          <span class="label-text">Material Name</span>
-        </label>
-        <input
-          type="text"
-          formControlName="name"
-          placeholder="Search by name"
-          class="input input-bordered w-full"
-        />
+      <div class="form-group">
+        <label for="name-search" class="form-label">Material Name</label>
+        <div class="relative">
+          <input
+            id="name-search"
+            type="text"
+            formControlName="name"
+            placeholder="Search by name"
+            class="form-input pl-9"
+          />
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-neutral-400 absolute left-3 top-1/2 transform -translate-y-1/2" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
+          </svg>
+        </div>
       </div>
 
       <!-- Min price -->
-      <div class="form-control">
-        <label class="label">
-          <span class="label-text">Min Price</span>
-        </label>
-        <input
-          type="number"
-          formControlName="minPrice"
-          placeholder="Min price"
-          class="input input-bordered w-full"
-          min="0"
-        />
+      <div class="form-group">
+        <label for="min-price" class="form-label">Min Price</label>
+        <div class="relative">
+          <span class="absolute left-3 top-1/2 transform -translate-y-1/2 text-neutral-500">$</span>
+          <input
+            id="min-price"
+            type="number"
+            formControlName="minPrice"
+            placeholder="Min price"
+            class="form-input pl-7"
+            min="0"
+          />
+        </div>
       </div>
 
       <!-- Max price -->
-      <div class="form-control">
-        <label class="label">
-          <span class="label-text">Max Price</span>
-        </label>
-        <input
-          type="number"
-          formControlName="maxPrice"
-          placeholder="Max price"
-          class="input input-bordered w-full"
-          min="0"
-        />
+      <div class="form-group">
+        <label for="max-price" class="form-label">Max Price</label>
+        <div class="relative">
+          <span class="absolute left-3 top-1/2 transform -translate-y-1/2 text-neutral-500">$</span>
+          <input
+            id="max-price"
+            type="number"
+            formControlName="maxPrice"
+            placeholder="Max price"
+            class="form-input pl-7"
+            min="0"
+          />
+        </div>
       </div>
 
       <!-- Status -->
-      <div class="form-control">
-        <label class="label">
-          <span class="label-text">Status</span>
-        </label>
-        <select
-          formControlName="status"
-          class="select select-bordered w-full"
-        >
-          <option [ngValue]="null">All Statuses</option>
-          <option *ngFor="let status of materialStatusOptions" [ngValue]="status">
-            {{ status }}
-          </option>
-        </select>
+      <div class="form-group">
+        <label for="status-filter" class="form-label">Status</label>
+        <div class="relative">
+          <select
+            id="status-filter"
+            formControlName="status"
+            class="form-input appearance-none pr-8"
+          >
+            <option [ngValue]="null">All Statuses</option>
+            <option *ngFor="let status of materialStatusOptions" [ngValue]="status">
+              {{ formatEnumValue(status) }}
+            </option>
+          </select>
+          <div class="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
+            <svg class="w-4 h-4 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+            </svg>
+          </div>
+        </div>
       </div>
     </form>
 
     <!-- Clear filters button -->
     <div class="flex justify-end mt-4">
-      <button class="btn btn-outline btn-sm" (click)="clearFilters()">
+      <button class="btn-outline btn-small flex items-center" (click)="clearFilters()">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
           <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
         </svg>
@@ -83,18 +97,20 @@
   </div>
 
   <!-- Loading state -->
-  <div *ngIf="loading" class="flex flex-col items-center justify-center p-8 space-y-3">
+  <div *ngIf="loading" class="flex flex-col items-center justify-center py-12 space-y-3">
     <div class="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-primary"></div>
     <p class="text-lg text-neutral-600 dark:text-neutral-400">Loading materials...</p>
   </div>
 
   <!-- Error state -->
-  <div *ngIf="error" class="alert alert-error flex items-center">
-    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" viewBox="0 0 20 20" fill="currentColor">
-      <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
-    </svg>
-    {{ error }}
-    <button class="btn btn-sm btn-outline ml-4" (click)="retry()">
+  <div *ngIf="error" class="alert alert-error mb-6 flex items-center justify-between flex-wrap gap-2">
+    <div class="flex items-center">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2 flex-shrink-0" viewBox="0 0 20 20" fill="currentColor">
+        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+      </svg>
+      <span>{{ error }}</span>
+    </div>
+    <button class="btn-outline btn-small flex items-center" (click)="retry()">
       <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
         <path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clip-rule="evenodd" />
       </svg>
@@ -103,26 +119,29 @@
   </div>
 
   <!-- Empty state -->
-  <div *ngIf="!loading && !error && materials.length === 0" class="bg-white dark:bg-neutral-800 rounded-lg shadow p-8 text-center">
-    <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto text-neutral-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+  <div *ngIf="!loading && !error && materials.length === 0" class="bg-white dark:bg-dark-surface rounded-lg shadow-card border border-neutral-200 dark:border-dark-border p-8 text-center transition-all duration-200">
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto text-neutral-400 dark:text-neutral-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
     </svg>
-    <h3 class="mt-4 text-lg font-medium">No materials found</h3>
+    <h3 class="mt-4 text-lg font-medium text-neutral-900 dark:text-dark-text">No materials found</h3>
     <p class="mt-2 text-neutral-600 dark:text-neutral-400">
       Try adjusting your search filters or add a new material.
     </p>
-    <button class="btn btn-primary mt-4" (click)="createMaterial()">
+    <button class="btn-primary mt-6" (click)="createMaterial()">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+        <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
+      </svg>
       Add Material
     </button>
   </div>
 
   <!-- Materials table -->
-  <div *ngIf="!loading && !error && materials.length > 0" class="bg-white dark:bg-neutral-800 rounded-lg shadow overflow-hidden">
+  <div *ngIf="!loading && !error && materials.length > 0" class="bg-white dark:bg-dark-surface rounded-lg shadow-card border border-neutral-200 dark:border-dark-border overflow-hidden transition-all duration-200">
     <div class="overflow-x-auto">
-      <table class="table table-zebra w-full">
+      <table class="table-container w-full">
         <thead>
           <tr>
-            <th class="cursor-pointer" (click)="onSortChange('name')">
+            <th class="cursor-pointer whitespace-nowrap" (click)="onSortChange('name')">
               <div class="flex items-center">
                 Name
                 <svg *ngIf="sortField === 'name'" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1" viewBox="0 0 20 20" fill="currentColor">
@@ -131,7 +150,7 @@
                 </svg>
               </div>
             </th>
-            <th class="cursor-pointer" (click)="onSortChange('quantity')">
+            <th class="cursor-pointer whitespace-nowrap" (click)="onSortChange('quantity')">
               <div class="flex items-center">
                 Quantity
                 <svg *ngIf="sortField === 'quantity'" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1" viewBox="0 0 20 20" fill="currentColor">
@@ -140,7 +159,7 @@
                 </svg>
               </div>
             </th>
-            <th class="cursor-pointer" (click)="onSortChange('price')">
+            <th class="cursor-pointer whitespace-nowrap" (click)="onSortChange('price')">
               <div class="flex items-center">
                 Price
                 <svg *ngIf="sortField === 'price'" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1" viewBox="0 0 20 20" fill="currentColor">
@@ -149,9 +168,9 @@
                 </svg>
               </div>
             </th>
-            <th>Status</th>
-            <th>Hazard Level</th>
-            <th class="cursor-pointer" (click)="onSortChange('category.name')">
+            <th class="whitespace-nowrap">Status</th>
+            <th class="hidden md:table-cell whitespace-nowrap">Hazard Level</th>
+            <th class="cursor-pointer hidden md:table-cell whitespace-nowrap" (click)="onSortChange('category.name')">
               <div class="flex items-center">
                 Category
                 <svg *ngIf="sortField === 'category.name'" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1" viewBox="0 0 20 20" fill="currentColor">
@@ -160,7 +179,7 @@
                 </svg>
               </div>
             </th>
-            <th class="cursor-pointer" (click)="onSortChange('listedAt')">
+            <th class="cursor-pointer hidden lg:table-cell whitespace-nowrap" (click)="onSortChange('listedAt')">
               <div class="flex items-center">
                 Listed At
                 <svg *ngIf="sortField === 'listedAt'" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1" viewBox="0 0 20 20" fill="currentColor">
@@ -169,45 +188,45 @@
                 </svg>
               </div>
             </th>
-            <th>Actions</th>
+            <th class="whitespace-nowrap">Actions</th>
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let material of materials" class="hover:bg-neutral-100 dark:hover:bg-neutral-700 cursor-pointer" (click)="viewMaterial(material.id)">
+          <tr *ngFor="let material of materials" class="hover:bg-neutral-100 dark:hover:bg-neutral-700 cursor-pointer transition-colors duration-200" (click)="viewMaterial(material.id)">
             <td class="font-medium">{{ material.name }}</td>
-            <td>{{ material.quantity }}</td>
-            <td>{{ material.price | currency }}</td>
+            <td>{{ material.quantity }} {{ formatEnumValue(material.unit) }}</td>
+            <td class="font-medium text-primary">{{ material.price | currency }}</td>
             <td>
               <span
                 [ngClass]="{
-                  'bg-green-100 text-green-800': material.status === 'AVAILABLE',
-                  'bg-yellow-100 text-yellow-800': material.status === 'RESERVED' || material.status === 'PENDING',
-                  'bg-red-100 text-red-800': material.status === 'SOLD' || material.status === 'EXPIRED'
+                  'badge-green': material.status === 'AVAILABLE',
+                  'badge-yellow': material.status === 'RESERVED' || material.status === 'PENDING',
+                  'badge-red': material.status === 'SOLD' || material.status === 'EXPIRED'
                 }"
-                class="px-2 py-1 text-xs font-medium rounded-full"
+                class="badge whitespace-nowrap"
               >
-                {{ material.status }}
+                {{ formatEnumValue(material.status) }}
               </span>
             </td>
-            <td>
+            <td class="hidden md:table-cell">
               <span
                 [ngClass]="{
-                  'bg-green-100 text-green-800': material.hazardLevel === 'NONE',
-                  'bg-blue-100 text-blue-800': material.hazardLevel === 'LOW',
-                  'bg-yellow-100 text-yellow-800': material.hazardLevel === 'MEDIUM',
-                  'bg-orange-100 text-orange-800': material.hazardLevel === 'HIGH',
-                  'bg-red-100 text-red-800': material.hazardLevel === 'EXTREME'
+                  'badge-green': material.hazardLevel === 'NONE',
+                  'badge-blue': material.hazardLevel === 'LOW',
+                  'badge-yellow': material.hazardLevel === 'MEDIUM',
+                  'badge-orange': material.hazardLevel === 'HIGH',
+                  'badge-red': material.hazardLevel === 'EXTREME'
                 }"
-                class="px-2 py-1 text-xs font-medium rounded-full"
+                class="badge whitespace-nowrap"
               >
-                {{ material.hazardLevel }}
+                {{ formatEnumValue(material.hazardLevel) }}
               </span>
             </td>
-          <p class="mt-1">{{ material.category ? material.category.name : 'Unknown' }}</p>
-            <td>{{ material.listedAt | date:'medium' }}</td>
-            <td class="text-right" (click)="$event.stopPropagation()">
-              <button class="btn btn-sm btn-ghost" (click)="viewMaterial(material.id)">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+            <td class="hidden md:table-cell">{{ material.category?.name || 'Unknown' }}</td>
+            <td class="hidden lg:table-cell whitespace-nowrap">{{ material.listedAt | date:'short' }}</td>
+            <td class="text-right whitespace-nowrap" (click)="$event.stopPropagation()">
+              <button class="btn-outline btn-small flex items-center p-1.5" (click)="viewMaterial(material.id)">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
                   <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
                   <path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd" />
                 </svg>
@@ -219,15 +238,16 @@
     </div>
 
     <!-- Pagination controls -->
-    <div *ngIf="page && page.totalPages > 1" class="flex justify-between items-center p-4 border-t">
-      <span class="text-sm text-neutral-600 dark:text-neutral-400">
+    <div *ngIf="page && page.totalPages > 1" class="flex flex-col sm:flex-row justify-between items-center p-4 border-t border-neutral-200 dark:border-dark-border">
+      <span class="text-sm text-neutral-600 dark:text-neutral-400 mb-3 sm:mb-0">
         Showing {{ page.number * page.size + 1 }} to {{ page.number * page.size + page.numberOfElements }} of {{ page.totalElements }} materials
       </span>
 
-      <div class="join">
+      <div class="flex space-x-1">
         <button
-          class="join-item btn btn-sm"
+          class="pagination-btn"
           [disabled]="page.first"
+          [class.opacity-50]="page.first"
           (click)="onPageChange(currentPage - 1)"
         >
           <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
@@ -237,16 +257,18 @@
 
         <button
           *ngFor="let pageNum of calculatePageNumbers()"
-          class="join-item btn btn-sm"
-          [class.btn-active]="pageNum === currentPage"
+          class="pagination-btn"
+          [class.bg-primary]="pageNum === currentPage"
+          [class.text-white]="pageNum === currentPage"
           (click)="onPageChange(pageNum)"
         >
           {{ pageNum + 1 }}
         </button>
 
         <button
-          class="join-item btn btn-sm"
+          class="pagination-btn"
           [disabled]="page.last"
+          [class.opacity-50]="page.last"
           (click)="onPageChange(currentPage + 1)"
         >
           <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">

@@ -1,0 +1,58 @@
+/* Material Component specific styles */
+.detail-label {
+  @apply text-sm font-medium text-neutral-500 dark:text-neutral-400;
+}
+
+.detail-value {
+  @apply mt-1 text-neutral-900 dark:text-dark-text;
+}
+
+.detail-item {
+  @apply pb-3 border-b border-neutral-200 dark:border-dark-border last:border-b-0 last:pb-0;
+}
+
+/* Badge colors */
+.badge-orange {
+  @apply badge bg-orange-100 text-orange-800 hover:bg-orange-200;
+}
+
+/* Button sizing */
+.btn-normal {
+  @apply px-4 py-2 rounded font-medium text-sm;
+}
+
+.btn-small {
+  @apply px-2 py-1 rounded text-xs;
+}
+
+/* Improve animations for components */
+.material-container .bg-white,
+.material-container .badge,
+.material-container button {
+  @apply transition-all duration-200;
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+  .material-container {
+    @apply px-2 py-3;
+  }
+
+  .detail-value {
+    @apply text-sm;
+  }
+}
+
+/* Loading animation */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.animate-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}

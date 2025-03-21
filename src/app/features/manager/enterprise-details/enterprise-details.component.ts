@@ -87,6 +87,9 @@ export class EnterpriseDetailsComponent implements OnInit {
     this.enterpriseService.getEnterpriseOfUser()
       .subscribe({
         next: (enterprise) => {
+           if(enterprise === null){
+             this.router.navigate(['/manager/enterprise-form']);
+           }
           this.enterprise = enterprise;
           this.enterpriseForm.patchValue({
             name: enterprise.name,
@@ -95,9 +98,11 @@ export class EnterpriseDetailsComponent implements OnInit {
           });
 
           this.statusUpdateRequest.enterpriseId = enterprise.id;
+          console.log(this.statusUpdateRequest.enterpriseId);
+          this.enterpriseId =  enterprise.id;
           this.statusUpdateRequest.newStatus = enterprise.status;
 
-          this.loadVerificationDocuments();
+            this.loadVerificationDocuments()
         },
         error: (error) => {
           this.toastService.error('Failed to load enterprise details');

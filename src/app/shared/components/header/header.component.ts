@@ -1,8 +1,11 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, OnDestroy } from '@angular/core';
 import { RouterLink, RouterLinkActive, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import {AuthService} from '../../../core/services/auth/auth.service';
-
+import { AuthService } from '../../../core/services/auth/auth.service';
+import { Store } from '@ngrx/store';
+import { selectCurrentUser, selectIsAuthenticated } from '../../../store/user/user.selectors';
+import { Observable, Subscription } from 'rxjs';
+import { User } from '../../../models/user';
 
 @Component({
   selector: 'app-header',
@@ -11,14 +14,30 @@ import {AuthService} from '../../../core/services/auth/auth.service';
   standalone: true,
   imports: [RouterLink, RouterLinkActive, CommonModule],
 })
-export class HeaderComponent implements OnInit {
+export class HeaderComponent implements OnInit, OnDestroy {
   isMenuOpen = false;
   isDarkMode = false;
 
+  // Store observables
+  currentUser$: Observable<User | null>;
+  isAuthenticated$: Observable<boolean>;
+
+  // For storing current values
+  isAuthenticated = false;
+  currentUser: User | null = null;
+
+  // Subscriptions
+  private subscriptions: Subscription[] = [];
+
   private authService = inject(AuthService);
   private router = inject(Router);
+  private store = inject(Store);
 
-  constructor() {}
+  constructor() {
+    // Initialize observables
+    this.isAuthenticated$ = this.store.select(selectIsAuthenticated);
+    this.currentUser$ = this.store.select(selectCurrentUser);
+  }
 
   ngOnInit() {
     // Check if user prefers dark mode
@@ -26,6 +45,27 @@ export class HeaderComponent implements OnInit {
         (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
       this.setDarkMode(true);
     }
+
+    // Subscribe to authentication state
+    this.subscriptions.push(
+      this.isAuthenticated$.subscribe(isAuthenticated => {
+        this.isAuthenticated = isAuthenticated;
+      })
+    );
+
+    // Subscribe to current user
+    this.subscriptions.push(
+      this.currentUser$.subscribe(user => {
+        this.currentUser = user;
+        // Log current user for debugging
+        console.log('Header component - Current user:', user);
+      })
+    );
+  }
+
+  ngOnDestroy() {
+    // Clean up subscriptions
+    this.subscriptions.forEach(sub => sub.unsubscribe());
   }
 
   toggleMenu() {
@@ -34,12 +74,19 @@ export class HeaderComponent implements OnInit {
 
   logout() {
     this.authService.logout();
-    this.router.navigate(['/login']);
     this.isMenuOpen = false;
   }
 
   isLoggedIn() {
-    return this.authService.isLoggedIn();
+    // Use the stored value from the store subscription
+    return this.isAuthenticated;
+  }
+
+  getCurrentUserInitial(): string {
+    if (this.currentUser && this.currentUser.firstName) {
+      return this.currentUser.firstName.charAt(0).toUpperCase();
+    }
+    return 'U';
   }
 
   toggleDarkMode() {

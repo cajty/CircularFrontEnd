@@ -8,6 +8,7 @@ export interface MaterialRequest {
   price?: number;
   status: MaterialStatus;
   hazardLevel: HazardLevel;
+  unit: MaterialUnit;
   categoryId: number;
   userId: number;
   locationId: number;
@@ -23,6 +24,7 @@ export interface MaterialResponse {
   listedAt: Date;
   availableUntil: Date;
   category: CategoryResponse;
+  unit: MaterialUnit;
   hazardLevel: HazardLevel;
   location: ActiveLocationResponse;
 }
@@ -33,6 +35,14 @@ export enum MaterialStatus {
   SOLD = "SOLD",
   EXPIRED = "EXPIRED",
   PENDING = "PENDING"
+}
+export enum MaterialUnit {
+    KG= "KG",
+    LITER = "LITER",
+    PIECE = "PIECE",
+    METER = "METER",
+    SQUARE_METER = "SQUARE_METER",
+    CUBIC_METER = "CUBIC_METER",
 }
 
 export interface MaterialSearchFilters {

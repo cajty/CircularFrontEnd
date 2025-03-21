@@ -5,6 +5,7 @@ import { Observable } from 'rxjs';
 import { environment } from '../../../../environments/environment';
 import { EnterpriseRequest, EnterpriseResponse } from '../../../models/enterprise';
 import {VerificationStatusUpdateRequest} from '../../../models/enterprise-verification';
+import {tap} from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
@@ -19,7 +20,15 @@ export class EnterpriseService {
   }
 
  getEnterpriseOfUser(): Observable<EnterpriseResponse> {
-   return this.http.get<EnterpriseResponse>(`${this.apiUrl}/user`);
+   return this.http.get<EnterpriseResponse>(`${this.apiUrl}/user`)
+     .pipe(
+       tap(response => {
+         if (response) {
+           console.log(response);
+         }
+       })
+
+     );
  }
 
 

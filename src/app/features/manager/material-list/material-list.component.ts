@@ -1,12 +1,12 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 
-import { finalize, debounceTime } from 'rxjs';
-import {MaterialResponse, MaterialSearchFilters, MaterialStatus} from '../../../models/material';
-import {Page} from '../../../models/page';
-import {MaterialService} from '../../../core/services/material/materail.service';
+import { finalize, debounceTime, Subject, takeUntil } from 'rxjs';
+import { MaterialResponse, MaterialSearchFilters, MaterialStatus, MaterialUnit } from '../../../models/material';
+import { Page } from '../../../models/page';
+import { MaterialService } from '../../../core/services/material/materail.service';
 
 @Component({
   selector: 'app-material-list',
@@ -15,19 +15,22 @@ import {MaterialService} from '../../../core/services/material/materail.service'
   templateUrl: './material-list.component.html',
   styleUrl: './material-list.component.css'
 })
-export class MaterialListComponent implements OnInit {
+export class MaterialListComponent implements OnInit, OnDestroy {
   materials: MaterialResponse[] = [];
   page: Page<MaterialResponse> | null = null;
   loading = true;
   error: string | null = null;
   currentPage = 0;
-  pageSize = 2;
+  pageSize = 10; // Increased page size for better usability
   sortField = 'listedAt';
   sortDirection = 'desc';
 
   // Search form
   searchForm!: FormGroup;
   materialStatusOptions = Object.values(MaterialStatus);
+
+  // For cleanup
+  private destroy$ = new Subject<void>();
 
   private materialService = inject(MaterialService);
   private router = inject(Router);
@@ -37,13 +40,21 @@ export class MaterialListComponent implements OnInit {
     this.initSearchForm();
     this.loadMaterials();
 
-    // Subscribe to form changes for automatic search
+
     this.searchForm.valueChanges
-      .pipe(debounceTime(500))
+      .pipe(
+        debounceTime(500),
+        takeUntil(this.destroy$)
+      )
       .subscribe(() => {
         this.currentPage = 0; // Reset to first page on filter change
         this.loadMaterials();
       });
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   private initSearchForm(): void {
@@ -59,8 +70,13 @@ export class MaterialListComponent implements OnInit {
     this.loading = true;
     this.error = null;
 
+
+    const formValues = this.searchForm.value;
     const filters: MaterialSearchFilters = {
-      ...this.searchForm.value
+      name: formValues.name || undefined,
+      minPrice: formValues.minPrice || undefined,
+      maxPrice: formValues.maxPrice || undefined,
+      status: formValues.status || undefined
     };
 
     const sort = `${this.sortField},${this.sortDirection}`;
@@ -76,7 +92,7 @@ export class MaterialListComponent implements OnInit {
         },
         error: (err) => {
           console.error('Error loading materials', err);
-          this.error = 'Failed to load materials';
+          this.error = 'Failed to load materials. Please try again later.';
         }
       });
   }
@@ -92,7 +108,7 @@ export class MaterialListComponent implements OnInit {
       this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
     } else {
       this.sortField = field;
-      this.sortDirection = 'asc'; // Default to ascending for new sort field
+      this.sortDirection = 'asc';
     }
 
     this.loadMaterials();
@@ -105,28 +121,28 @@ export class MaterialListComponent implements OnInit {
       maxPrice: null,
       status: null
     });
-
     // Form valueChanges will trigger the search
   }
 
   viewMaterial(id: number): void {
-    this.router.navigate(['/manager/materials', id]);
+    this.router.navigate(['manager/materials', id]);
   }
 
   createMaterial(): void {
-    this.router.navigate(['/manager/materials/new']);
+    this.router.navigate(['manager/materials/new']);
   }
 
   retry(): void {
     this.loadMaterials();
   }
 
+  // Format enum values for display
+  formatEnumValue(value: string): string {
+    if (!value) return '';
 
-  getSortIcon(field: string): string {
-    if (field !== this.sortField) {
-      return 'sort';
-    }
-    return this.sortDirection === 'asc' ? 'sort-up' : 'sort-down';
+    return value.split('_')
+      .map(word => word.charAt(0) + word.slice(1).toLowerCase())
+      .join(' ');
   }
 
   calculatePageNumbers(): number[] {

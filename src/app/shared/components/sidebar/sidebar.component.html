@@ -1,6 +1,6 @@
 <div class="flex relative min-h-screen">
 
-  <!-- Overlay - shows when drawer is open on any device when in complete hidden mode -->
+
   @if (isDrawerOpen() && (isMobile || isCompletelyHidden)) {
     <div class="fixed inset-0 bg-black bg-opacity-50 z-40" (click)="toggleDrawer()"></div>
   }
@@ -129,23 +129,24 @@
     </nav>
   </aside>
 
-  <!-- Toggle button - visible when sidebar is completely hidden -->
-  <button
-    *ngIf="isCompletelyHidden && !isDrawerOpen()"
-    class="fixed bottom-4 right-4 z-50 flex items-center justify-center bg-primary text-white rounded-full w-12 h-12 shadow-lg"
-    (click)="toggleDrawer()"
-    aria-label="Show sidebar">
-    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-    </svg>
-  </button>
 
-  <!-- Main content area -->
+ <!-- Toggle button - visible when sidebar is completely hidden, now positioned in the left top corner -->
+<button
+  *ngIf="isCompletelyHidden && !isDrawerOpen()"
+  class="fixed top-[20vh] left-4 z-50 flex items-center justify-center bg-white bg-opacity-10 text-gray-200 border-0 rounded-full w-7 h-7 cursor-pointer hover:bg-opacity-15"
+  (click)="toggleDrawer()"
+  aria-label="Show sidebar">
+  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+  </svg>
+</button>
+
+
   <div class="flex-1 transition-all duration-300 min-h-screen"
        [class.ml-64]="isDrawerOpen() && !isMobile && !isCompletelyHidden"
        [class.ml-16]="!isDrawerOpen() && !isMobile && !isCompletelyHidden"
        [class.ml-0]="isMobile || isCompletelyHidden">
 
-    <router-outlet></router-outlet>
+
   </div>
 </div>

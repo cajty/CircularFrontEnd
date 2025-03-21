@@ -1,0 +1,82 @@
+/* Material List Component specific styles */
+.form-group {
+  @apply relative mb-2;
+}
+
+.form-input {
+  @apply w-full border border-neutral-300 dark:border-dark-border rounded-md py-2 px-3 text-neutral-900 dark:text-dark-text
+    bg-white dark:bg-dark-surface focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent
+    transition-all duration-200 ease-in-out hover:border-neutral-400 dark:hover:border-neutral-600;
+}
+
+.form-label {
+  @apply block text-sm font-medium text-neutral-800 dark:text-neutral-300 mb-1;
+}
+
+/* Badge style */
+.badge-orange {
+  @apply badge bg-orange-100 text-orange-800 hover:bg-orange-200 dark:bg-orange-900 dark:text-orange-100;
+}
+
+/* Pagination button styling */
+.pagination-btn {
+  @apply flex items-center justify-center h-8 min-w-8 px-3 py-1 rounded text-sm font-medium
+    bg-white dark:bg-dark-surface text-neutral-700 dark:text-neutral-300
+    border border-neutral-300 dark:border-dark-border
+    transition-colors duration-200 hover:bg-neutral-100 dark:hover:bg-neutral-700
+    focus:outline-none focus:ring-2 focus:ring-primary focus:ring-opacity-50;
+}
+
+/* Table styling refinements */
+table {
+  @apply border-collapse;
+}
+
+table th {
+  @apply px-4 py-3 bg-neutral-100 dark:bg-dark-surface text-left text-xs font-medium text-neutral-600
+    dark:text-neutral-300 uppercase tracking-wider border-b border-neutral-200 dark:border-dark-border;
+}
+
+table td {
+  @apply px-4 py-3 text-sm border-b border-neutral-200 dark:border-dark-border;
+}
+
+/* Remove bottom border from last row */
+table tr:last-child td {
+  @apply border-b-0;
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+  .material-list-container {
+    @apply px-2 py-3;
+  }
+
+  table th,
+  table td {
+    @apply px-3 py-2;
+  }
+
+  .pagination-btn {
+    @apply h-7 min-w-7 px-2;
+  }
+}
+
+/* Improve table scrolling on mobile */
+.overflow-x-auto {
+  @apply -mx-4 px-4;
+  scrollbar-width: thin;
+}
+
+/* Hover effects for interactive elements */
+.btn-primary, .btn-outline, .pagination-btn {
+  @apply transition-all duration-200;
+}
+
+.btn-primary:hover, .btn-outline:hover, .pagination-btn:hover:not(:disabled) {
+  @apply transform -translate-y-0.5;
+}
+
+.btn-primary:active, .btn-outline:active, .pagination-btn:active:not(:disabled) {
+  @apply transform translate-y-0;
+}

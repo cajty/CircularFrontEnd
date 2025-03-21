@@ -1,20 +1,20 @@
-<div class="material-container p-4">
+<div class="material-container p-4 max-w-5xl mx-auto">
   <!-- Page Header -->
-  <div class="flex justify-between items-center mb-6">
-    <h1 class="text-2xl font-bold">
+  <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+    <h1 class="text-2xl font-bold text-neutral-900 dark:text-dark-text">
       {{ material ? (isEditing ? 'Edit' : material.name) : 'Add New Material' }}
     </h1>
 
     <!-- Action buttons for viewing mode -->
-    <div *ngIf="material && !isEditing" class="flex space-x-2">
-      <button class="btn btn-primary" (click)="onEdit()">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
+    <div *ngIf="material && !isEditing" class="flex space-x-2 self-end sm:self-auto">
+      <button class="btn-outline btn-small sm:btn-normal flex items-center" (click)="onEdit()">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 sm:h-5 sm:w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
           <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
         </svg>
         Edit
       </button>
-      <button class="btn btn-error" (click)="onDelete()" [disabled]="submitting">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
+      <button class="btn-danger btn-small sm:btn-normal flex items-center" (click)="onDelete()" [disabled]="submitting">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 sm:h-5 sm:w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
           <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
         </svg>
         Delete
@@ -23,99 +23,137 @@
   </div>
 
   <!-- Loading state -->
-  <div *ngIf="loading" class="flex flex-col items-center justify-center p-8 space-y-3">
+  <div *ngIf="loading" class="flex flex-col items-center justify-center py-12 space-y-3">
     <div class="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-primary"></div>
     <p class="text-lg text-neutral-600 dark:text-neutral-400">Loading material...</p>
   </div>
 
   <!-- Error state -->
   <div *ngIf="error" class="alert alert-error mb-6">
-    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" viewBox="0 0 20 20" fill="currentColor">
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2 flex-shrink-0" viewBox="0 0 20 20" fill="currentColor">
       <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
     </svg>
-    {{ error }}
+    <span>{{ error }}</span>
   </div>
 
   <!-- Material details view mode -->
-  <div *ngIf="material && !isEditing && !loading" class="bg-white dark:bg-neutral-800 rounded-lg shadow p-6">
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+  <div *ngIf="material && !isEditing && !loading" class="bg-white dark:bg-dark-surface rounded-lg shadow-card border border-neutral-200 dark:border-dark-border p-4 sm:p-6 transition-all duration-300">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
       <!-- Left column -->
-      <div>
-        <div class="mb-4">
-          <h3 class="text-sm font-medium text-neutral-500 dark:text-neutral-400">Material Name</h3>
-          <p class="mt-1 text-lg">{{ material.name }}</p>
+      <div class="space-y-4">
+        <!-- Material name with badge -->
+        <div class="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
+          <h2 class="text-xl font-semibold text-neutral-900 dark:text-dark-text">{{ material.name }}</h2>
+          <div class="flex items-center gap-2">
+            <span
+              [ngClass]="{
+                'badge-green': material.status === 'AVAILABLE',
+                'badge-yellow': material.status === 'RESERVED' || material.status === 'PENDING',
+                'badge-red': material.status === 'SOLD' || material.status === 'EXPIRED'
+              }"
+              class="badge"
+            >
+              {{ formatEnumValue(material.status) }}
+            </span>
+            <span
+              [ngClass]="{
+                'badge-green': material.hazardLevel === 'NONE',
+                'badge-blue': material.hazardLevel === 'LOW',
+                'badge-yellow': material.hazardLevel === 'MEDIUM',
+                'badge-orange bg-orange-100 text-orange-800 hover:bg-orange-200': material.hazardLevel === 'HIGH',
+                'badge-red': material.hazardLevel === 'EXTREME'
+              }"
+              class="badge"
+            >
+              {{ formatEnumValue(material.hazardLevel) }}
+            </span>
+          </div>
         </div>
 
-        <div class="mb-4">
-          <h3 class="text-sm font-medium text-neutral-500 dark:text-neutral-400">Description</h3>
-          <p class="mt-1">{{ material.description || 'No description provided' }}</p>
+        <div class="detail-item">
+          <h3 class="detail-label">Description</h3>
+          <p class="detail-value">{{ material.description || 'No description provided' }}</p>
         </div>
 
-        <div class="mb-4">
-          <h3 class="text-sm font-medium text-neutral-500 dark:text-neutral-400">Quantity</h3>
-          <p class="mt-1">{{ material.quantity }}</p>
+        <!-- Quantity and Unit -->
+        <div class="detail-item">
+          <h3 class="detail-label">Quantity</h3>
+          <p class="detail-value">{{ material.quantity }} {{ formatEnumValue(material.unit) }}</p>
         </div>
 
-        <div class="mb-4">
-          <h3 class="text-sm font-medium text-neutral-500 dark:text-neutral-400">Price</h3>
-          <p class="mt-1">{{ material.price | currency }}</p>
+        <div class="detail-item">
+          <h3 class="detail-label">Price</h3>
+          <p class="detail-value font-medium text-primary">{{ material.price | currency }}</p>
+        </div>
+
+        <div class="detail-item">
+          <h3 class="detail-label">Category</h3>
+          <p class="detail-value">{{ material.category?.name || 'Unknown' }}</p>
         </div>
       </div>
 
       <!-- Right column -->
-      <div>
-        <div class="mb-4">
-          <h3 class="text-sm font-medium text-neutral-500 dark:text-neutral-400">Status</h3>
-          <div class="mt-1">
-            <span
-              [ngClass]="{
-                'bg-green-100 text-green-800': material.status === 'AVAILABLE',
-                'bg-yellow-100 text-yellow-800': material.status === 'RESERVED' || material.status === 'PENDING',
-                'bg-red-100 text-red-800': material.status === 'SOLD' || material.status === 'EXPIRED'
-              }"
-              class="px-2 py-1 text-xs font-medium rounded-full"
-            >
-              {{ material.status }}
-            </span>
+      <div class="space-y-4">
+        <div class="detail-item">
+          <h3 class="detail-label">Location</h3>
+          <div class="flex items-start gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-neutral-500 mt-0.5 flex-shrink-0" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" />
+            </svg>
+            <p class="detail-value">{{ material.location?.address }}, {{ material.location?.cityName }}</p>
           </div>
         </div>
 
-        <div class="mb-4">
-          <h3 class="text-sm font-medium text-neutral-500 dark:text-neutral-400">Hazard Level</h3>
-          <div class="mt-1">
-            <span
-              [ngClass]="{
-                'bg-green-100 text-green-800': material.hazardLevel === 'NONE',
-                'bg-blue-100 text-blue-800': material.hazardLevel === 'LOW',
-                'bg-yellow-100 text-yellow-800': material.hazardLevel === 'MEDIUM',
-                'bg-orange-100 text-orange-800': material.hazardLevel === 'HIGH',
-                'bg-red-100 text-red-800': material.hazardLevel === 'EXTREME'
-              }"
-              class="px-2 py-1 text-xs font-medium rounded-full"
-            >
-              {{ material.hazardLevel }}
-            </span>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div class="detail-item">
+            <h3 class="detail-label">Listed At</h3>
+            <div class="flex items-start gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-neutral-500 mt-0.5 flex-shrink-0" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd" />
+              </svg>
+              <p class="detail-value">{{ material.listedAt | date:'medium' }}</p>
+            </div>
+          </div>
+
+          <div class="detail-item">
+            <h3 class="detail-label">Available Until</h3>
+            <div class="flex items-start gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-neutral-500 mt-0.5 flex-shrink-0" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd" />
+              </svg>
+              <p class="detail-value">{{ material.availableUntil | date:'medium' }}</p>
+            </div>
           </div>
         </div>
 
-        <div class="mb-4">
-          <h3 class="text-sm font-medium text-neutral-500 dark:text-neutral-400">Category</h3>
-          <p class="mt-1">{{ material.category?.name || 'Unknown' }}</p>
-        </div>
+        <!-- Availability card -->
+        <div class="p-4 bg-neutral-100 dark:bg-dark-bg rounded-lg border border-neutral-200 dark:border-dark-border mt-2">
+          <h3 class="text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-2">Availability Status</h3>
 
-        <div class="mb-4">
-          <h3 class="text-sm font-medium text-neutral-500 dark:text-neutral-400">Location</h3>
-          <p class="mt-1">{{ material.location?.address }}, {{ material.location?.cityName }}</p>
-        </div>
+          <div class="flex flex-col space-y-2">
+            <!-- Status indicator -->
+            <div class="flex justify-between items-center">
+              <span class="text-sm text-neutral-600 dark:text-neutral-400">Status</span>
+              <span
+                [ngClass]="{
+                  'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100': material.status === 'AVAILABLE',
+                  'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-100': material.status === 'RESERVED' || material.status === 'PENDING',
+                  'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-100': material.status === 'SOLD' || material.status === 'EXPIRED'
+                }"
+                class="px-2 py-1 text-xs font-medium rounded-full"
+              >
+                {{ formatEnumValue(material.status) }}
+              </span>
+            </div>
 
-        <div class="mb-4">
-          <h3 class="text-sm font-medium text-neutral-500 dark:text-neutral-400">Listed At</h3>
-          <p class="mt-1">{{ material.listedAt | date:'medium' }}</p>
-        </div>
-
-        <div class="mb-4">
-          <h3 class="text-sm font-medium text-neutral-500 dark:text-neutral-400">Available Until</h3>
-          <p class="mt-1">{{ material.availableUntil | date:'medium' }}</p>
+            <!-- Time remaining indicator -->
+            <div class="flex justify-between items-center">
+              <span class="text-sm text-neutral-600 dark:text-neutral-400">Time remaining</span>
+              <span class="text-sm font-medium">
+                {{ calculateDaysRemaining(material.availableUntil) }}
+              </span>
+            </div>
+          </div>
         </div>
       </div>
     </div>

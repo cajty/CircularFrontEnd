@@ -49,8 +49,8 @@ export class LoginComponent {
       )
       .subscribe({
         next: (success) => {
-          if (success) {
-            this.router.navigate(['/categories']);
+          if(success){
+            this.router.navigate(['/manager/enterprise-details']);
           }
         },
         error: (error) => {

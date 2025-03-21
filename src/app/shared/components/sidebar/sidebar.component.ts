@@ -57,10 +57,12 @@ export class SidebarComponent implements OnInit, OnDestroy {
     {
       name: 'MANAGEMENT',
       links: [
-        { icon: 'building', label: 'Enterprise', route: '/enterprise' },
+        { icon: 'building', label: 'Enterprise', route: 'admin/enterprises' },
         { icon: 'location', label: 'Locations', route: '/locations' },
         { icon: 'category', label: 'Categories', route: '/categories' },
-        { icon: 'transactions', label: 'Transactions', route: '/transactions' }
+        { icon: 'transactions', label: 'Transactions', route: '/transactions' },
+        { icon: 'cities', label: 'enterprise-details', route: '/manager/enterprise-details' },
+        { icon: 'cities', label: 'enterprise-form', route: '/manager/enterprise-form' },
       ]
     }
   ];
@@ -110,7 +112,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
 
   toggleDrawer() {
     this.isDrawerOpen.update(isOpen => !isOpen);
-    // Save state based on device type
+
     if (this.isMobile) {
       localStorage.setItem('sidebarMobileState', this.isDrawerOpen().toString());
     } else {
@@ -122,13 +124,13 @@ export class SidebarComponent implements OnInit, OnDestroy {
     this.isCompletelyHidden = !this.isCompletelyHidden;
     localStorage.setItem('sidebarCompletelyHidden', this.isCompletelyHidden.toString());
 
-    // If toggling to completely hidden, also close the drawer
+
     if (this.isCompletelyHidden) {
       this.isDrawerOpen.set(false);
     }
   }
 
-  // New methods for category dropdown functionality
+
   toggleCategory(categoryName: string) {
     this.openCategories[categoryName] = !this.isCategoryOpen(categoryName);
     this.saveCategoryStates();
@@ -151,7 +153,9 @@ export class SidebarComponent implements OnInit, OnDestroy {
       'building': 'M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4',
       'location': 'M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z M15 11a3 3 0 11-6 0 3 3 0 016 0z',
       'category': 'M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01',
-      'transactions': 'M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4'
+      'transactions': 'M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4',
+      'cities': 'M12 2a10 10 0 100 20 10 10 0 000-20z M12 6a6 6 0 100 12 6 6 0 000-12z M12 10a2 2 0 100 4 2 2 0 000-4z',
+
     };
 
     return paths[icon] || '';

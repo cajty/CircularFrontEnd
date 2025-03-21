@@ -1,12 +1,12 @@
 import { Component, EventEmitter, Input, OnInit, Output, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { MaterialRequest, MaterialResponse, MaterialStatus, HazardLevel } from '../../../models/material';
+import { MaterialRequest, MaterialResponse, MaterialStatus, HazardLevel, MaterialUnit } from '../../../models/material';
 import { LocationListComponent } from '../location-list/location-list.component';
 
 import { finalize } from 'rxjs';
-import {CategoryListComponent} from '../../../shared/components/category-list/category-list.component';
-import {MaterialService} from '../../../core/services/material/materail.service';
+import { CategoryListComponent } from '../../../shared/components/category-list/category-list.component';
+import { MaterialService } from '../../../core/services/material/materail.service';
 
 
 @Component({
@@ -34,6 +34,7 @@ export class MaterialFormComponent implements OnInit {
 
   materialStatusOptions = Object.values(MaterialStatus);
   hazardLevelOptions = Object.values(HazardLevel);
+  materialUnitOptions = Object.values(MaterialUnit);
 
   private fb = inject(FormBuilder);
   private materialService = inject(MaterialService);
@@ -54,6 +55,7 @@ export class MaterialFormComponent implements OnInit {
       price: [0, [Validators.min(0)]],
       status: [MaterialStatus.AVAILABLE, [Validators.required]],
       hazardLevel: [HazardLevel.NONE, [Validators.required]],
+      unit: [MaterialUnit.PIECE, [Validators.required]],
       categoryId: [null, [Validators.required]],
       locationId: [null, [Validators.required]],
       availableUntil: [this.getDefaultExpiryDate(), [Validators.required]]
@@ -70,6 +72,7 @@ export class MaterialFormComponent implements OnInit {
       price: this.material.price,
       status: this.material.status,
       hazardLevel: this.material.hazardLevel,
+      unit: this.material.unit,
       categoryId: this.material.category?.id,
       locationId: this.material.location?.id,
       availableUntil: this.formatDateForInput(this.material.availableUntil)
@@ -94,6 +97,7 @@ export class MaterialFormComponent implements OnInit {
       userId: this.getUserId() // This should be retrieved from auth service
     };
 
+    this.submitting = true;
     this.formSubmit.emit(materialRequest);
   }
 
@@ -136,5 +140,14 @@ export class MaterialFormComponent implements OnInit {
   isControlInvalid(controlName: string): boolean {
     const control = this.materialForm.get(controlName);
     return !!(control && control.touched && control.invalid);
+  }
+
+  // Method to format enum values for display
+  formatEnumValue(value: string): string {
+    if (!value) return '';
+    // Convert SQUARE_METER to "Square Meter"
+    return value.split('_')
+      .map(word => word.charAt(0) + word.slice(1).toLowerCase())
+      .join(' ');
   }
 }

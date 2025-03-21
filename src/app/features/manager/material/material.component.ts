@@ -3,9 +3,9 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 
 import { finalize } from 'rxjs';
-import {MaterialFormComponent} from '../material-form/material-form.component';
-import {MaterialRequest, MaterialResponse} from '../../../models/material';
-import {MaterialService} from '../../../core/services/material/materail.service';
+import { MaterialFormComponent } from '../material-form/material-form.component';
+import { MaterialRequest, MaterialResponse } from '../../../models/material';
+import { MaterialService } from '../../../core/services/material/materail.service';
 
 @Component({
   selector: 'app-material',
@@ -53,7 +53,7 @@ export class MaterialComponent implements OnInit {
         },
         error: (err) => {
           console.error('Error loading material', err);
-          this.error = 'Failed to load material details';
+          this.error = 'Failed to load material details. Please try again later.';
         }
       });
   }
@@ -65,7 +65,7 @@ export class MaterialComponent implements OnInit {
   onDelete(): void {
     if (!this.material?.id) return;
 
-    if (confirm('Are you sure you want to delete this material?')) {
+    if (confirm('Are you sure you want to delete this material? This action cannot be undone.')) {
       this.submitting = true;
 
       this.materialService.deleteMaterial(this.material.id)
@@ -78,7 +78,7 @@ export class MaterialComponent implements OnInit {
           },
           error: (err) => {
             console.error('Error deleting material', err);
-            this.error = 'Failed to delete material';
+            this.error = 'Failed to delete material. Please try again later.';
           }
         });
     }
@@ -109,7 +109,7 @@ export class MaterialComponent implements OnInit {
         },
         error: (err) => {
           console.error('Error saving material', err);
-          this.error = 'Failed to save material';
+          this.error = 'Failed to save material. Please check your inputs and try again.';
         }
       });
   }
@@ -121,6 +121,38 @@ export class MaterialComponent implements OnInit {
     } else {
       // If creating a new material, navigate back to the materials list
       this.router.navigate(['/materials']);
+    }
+  }
+
+  // Helper method to format enum values for display
+  formatEnumValue(value: string): string {
+    if (!value) return '';
+    // Convert SQUARE_METER to "Square Meter"
+    return value.split('_')
+      .map(word => word.charAt(0) + word.slice(1).toLowerCase())
+      .join(' ');
+  }
+
+  // Calculate days remaining until expiry
+  calculateDaysRemaining(dateStr: Date | string): string {
+    const today = new Date();
+    const expiryDate = new Date(dateStr);
+
+    // Clear time part for accurate day calculation
+    today.setHours(0, 0, 0, 0);
+    expiryDate.setHours(0, 0, 0, 0);
+
+    const diffTime = expiryDate.getTime() - today.getTime();
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+    if (diffDays < 0) {
+      return 'Expired';
+    } else if (diffDays === 0) {
+      return 'Expires today';
+    } else if (diffDays === 1) {
+      return '1 day left';
+    } else {
+      return `${diffDays} days left`;
     }
   }
 }

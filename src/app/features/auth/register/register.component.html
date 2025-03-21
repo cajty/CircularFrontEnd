@@ -1,12 +1,12 @@
 <div class="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
   <div class="max-w-md w-full space-y-8">
     <div class="text-center">
-      <h2 class="mt-6 text-3xl font-extrabold text-neutral-900 dark:text-white">
+      <h2 class="mt-6 text-3xl font-extrabold text-neutral-900 dark:text-dark-text">
         Create your account
       </h2>
-      <p class="mt-2 text-sm text-neutral-600 dark:text-neutral-400">
+      <p class="mt-2 text-sm text-neutral-600 dark:text-neutral-300">
         Already have an account?
-        <a routerLink="/login" class="font-medium text-primary hover:text-primary-dark">
+        <a routerLink="/login" class="font-medium">
           Sign in here
         </a>
       </p>
@@ -34,27 +34,84 @@
 
     <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="mt-8 space-y-6">
       <div class="rounded-md shadow-sm space-y-4">
-        <!-- Name input -->
+        <!-- First Name input -->
         <div>
-          <label for="name" class="form-label">Full Name</label>
+          <label for="firstName" class="form-label">
+            First Name
+          </label>
           <input
-            id="name"
-            formControlName="name"
+            id="firstName"
+            formControlName="firstName"
             type="text"
             required
             class="form-input"
-            [ngClass]="{'border-error': registerForm.get('name')?.invalid && registerForm.get('name')?.touched}"
-            placeholder="Enter your name"
+            [ngClass]="{'border-error': registerForm.get('firstName')?.invalid && registerForm.get('firstName')?.touched}"
+            placeholder="Enter your first name"
           />
-          <div *ngIf="registerForm.get('name')?.invalid && registerForm.get('name')?.touched" class="form-error">
-            <span *ngIf="registerForm.get('name')?.errors?.['required']">Name is required</span>
-            <span *ngIf="registerForm.get('name')?.errors?.['minlength']">Name must be at least 3 characters</span>
+          <div *ngIf="registerForm.get('firstName')?.invalid && registerForm.get('firstName')?.touched" class="form-error">
+            <span *ngIf="registerForm.get('firstName')?.errors?.['required']">First name is mandatory</span>
+          </div>
+        </div>
+
+        <!-- Last Name input -->
+        <div>
+          <label for="lastName" class="form-label">
+            Last Name
+          </label>
+          <input
+            id="lastName"
+            formControlName="lastName"
+            type="text"
+            required
+            class="form-input"
+            [ngClass]="{'border-error': registerForm.get('lastName')?.invalid && registerForm.get('lastName')?.touched}"
+            placeholder="Enter your last name"
+          />
+          <div *ngIf="registerForm.get('lastName')?.invalid && registerForm.get('lastName')?.touched" class="form-error">
+            <span *ngIf="registerForm.get('lastName')?.errors?.['required']">Last name is mandatory</span>
+          </div>
+        </div>
+
+        <!-- Phone Number input with country code dropdown -->
+        <div>
+          <label for="phoneNumber" class="form-label">
+            Phone Number
+          </label>
+          <div class="flex">
+            <!-- Country Code Dropdown -->
+            <select
+              formControlName="countryCode"
+              class="form-input rounded-r-none border-r-0 w-28 appearance-none bg-no-repeat bg-right-4 pr-8"
+              style="background-image: url('data:image/svg+xml,%3csvg xmlns=%27http://www.w3.org/2000/svg%27 fill=%27none%27 viewBox=%270 0 20 20%27%3e%3cpath stroke=%27%2357606a%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27 stroke-width=%271.5%27 d=%27M6 8l4 4 4-4%27/%3e%3c/svg%3e'); background-size: 1.5em 1.5em;"
+              (change)="onCountryChange($event)"
+            >
+              <option *ngFor="let country of countryOptions" [value]="country.dialCode">
+                {{country.name}} ({{country.dialCode}})
+              </option>
+            </select>
+
+            <!-- Phone Input -->
+            <input
+              id="phoneNumber"
+              formControlName="phoneNumber"
+              type="tel"
+              required
+              class="form-input rounded-l-none flex-1"
+              [ngClass]="{'border-error': registerForm.get('phoneNumber')?.invalid && registerForm.get('phoneNumber')?.touched}"
+              placeholder="Enter phone number"
+              autocomplete="tel"
+            />
+          </div>
+          <div *ngIf="registerForm.get('phoneNumber')?.invalid && registerForm.get('phoneNumber')?.touched" class="form-error">
+            <span *ngIf="registerForm.get('phoneNumber')?.errors?.['required']">Phone number is mandatory</span>
           </div>
         </div>
 
         <!-- Email input -->
         <div>
-          <label for="email" class="form-label">Email address</label>
+          <label for="email" class="form-label">
+            Email address
+          </label>
           <input
             id="email"
             formControlName="email"
@@ -66,14 +123,16 @@
             placeholder="Email address"
           />
           <div *ngIf="registerForm.get('email')?.invalid && registerForm.get('email')?.touched" class="form-error">
-            <span *ngIf="registerForm.get('email')?.errors?.['required']">Email is required</span>
-            <span *ngIf="registerForm.get('email')?.errors?.['email']">Please enter a valid email</span>
+            <span *ngIf="registerForm.get('email')?.errors?.['required']">Email is mandatory</span>
+            <span *ngIf="registerForm.get('email')?.errors?.['email']">Email should be valid</span>
           </div>
         </div>
 
         <!-- Password input -->
         <div>
-          <label for="password" class="form-label">Password</label>
+          <label for="password" class="form-label">
+            Password
+          </label>
           <input
             id="password"
             formControlName="password"
@@ -85,8 +144,8 @@
             placeholder="Create a password"
           />
           <div *ngIf="registerForm.get('password')?.invalid && registerForm.get('password')?.touched" class="form-error">
-            <div *ngIf="registerForm.get('password')?.errors?.['required']">Password is required</div>
-            <div *ngIf="registerForm.get('password')?.errors?.['minlength']">Password must be at least 8 characters</div>
+            <div *ngIf="registerForm.get('password')?.errors?.['required']">Password is mandatory</div>
+            <div *ngIf="registerForm.get('password')?.errors?.['minlength']">Password should have at least 8 characters</div>
             <div *ngIf="registerForm.get('password')?.errors?.['pattern']">
               Password must contain at least:
               <ul class="list-disc pl-5 mt-1">
@@ -100,7 +159,9 @@
 
         <!-- Confirm Password input -->
         <div>
-          <label for="confirmPassword" class="form-label">Confirm Password</label>
+          <label for="confirmPassword" class="form-label">
+            Confirm Password
+          </label>
           <input
             id="confirmPassword"
             formControlName="confirmPassword"
@@ -138,11 +199,11 @@
 
       <div class="text-center text-sm text-neutral-600 dark:text-neutral-400">
         By signing up, you agree to our
-        <a routerLink="/terms" class="font-medium text-primary hover:text-primary-dark">
+        <a routerLink="/terms" class="font-medium">
           Terms of Service
         </a>
         and
-        <a routerLink="/privacy" class="font-medium text-primary hover:text-primary-dark">
+        <a routerLink="/privacy" class="font-medium">
           Privacy Policy
         </a>
       </div>
