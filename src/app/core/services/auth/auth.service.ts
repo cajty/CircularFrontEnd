@@ -109,14 +109,9 @@ export class AuthService {
   }
 
   logout(): void {
-    // Dispatch logout action to the store
+    // Simply dispatch the logout action to the store
+    // The effects will handle the rest
     this.store.dispatch(UserActions.logout());
-
-    // The rest is handled by the effect, but we'll keep this for backward compatibility
-    localStorage.removeItem(this.AUTH_TOKEN);
-    this.isAuthenticatedSubject.next(false);
-    this.router.navigate(['/login']);
-    this.toastService.info('You have been logged out');
   }
 
   isLoggedIn(): boolean {

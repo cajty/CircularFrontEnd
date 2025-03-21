@@ -6,6 +6,7 @@ import { Store } from '@ngrx/store';
 import { selectCurrentUser, selectIsAuthenticated } from '../../../store/user/user.selectors';
 import { Observable, Subscription } from 'rxjs';
 import { User } from '../../../models/user';
+import * as UserActions from '../../../store/user/user.actions';
 
 @Component({
   selector: 'app-header',
@@ -18,7 +19,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
   isMenuOpen = false;
   isDarkMode = false;
 
-  // Store observables
+
   currentUser$: Observable<User | null>;
   isAuthenticated$: Observable<boolean>;
 
@@ -57,8 +58,6 @@ export class HeaderComponent implements OnInit, OnDestroy {
     this.subscriptions.push(
       this.currentUser$.subscribe(user => {
         this.currentUser = user;
-        // Log current user for debugging
-        console.log('Header component - Current user:', user);
       })
     );
   }
@@ -73,7 +72,8 @@ export class HeaderComponent implements OnInit, OnDestroy {
   }
 
   logout() {
-    this.authService.logout();
+    // Dispatch logout action directly to the store instead of going through the service
+    this.store.dispatch(UserActions.logout());
     this.isMenuOpen = false;
   }
 

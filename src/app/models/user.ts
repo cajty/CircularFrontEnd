@@ -3,7 +3,7 @@ export interface User {
   firstName: string;
   lastName: string;
   phoneNumber: string;
-  roles: Set<string>;
+   roles: string[];
 }
 
 export interface RegisterRequest {

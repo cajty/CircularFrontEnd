@@ -54,5 +54,9 @@ export const userReducer = createReducer(
     ...state,
     error,
     loading: false
+  })),
+
+  on(UserActions.resetUserState, () => ({
+    ...initialUserState,
   }))
 );

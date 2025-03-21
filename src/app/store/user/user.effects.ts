@@ -4,12 +4,14 @@ import { of } from 'rxjs';
 import { catchError, map, mergeMap, tap, switchMap } from 'rxjs/operators';
 import * as UserActions from './user.actions';
 import {AuthService} from '../../core/services/auth/auth.service';
+import {Router} from "@angular/router";
 
 
 @Injectable()
 export class UserEffects {
   private userService = inject(AuthService);
   private actions$ = inject(Actions);
+  private router = inject(Router);
 
 
   loadCurrentUser$ = createEffect(() =>
@@ -33,14 +35,21 @@ export class UserEffects {
   );
 
 
-  logout$ = createEffect(() =>
+   logout$ = createEffect(() =>
     this.actions$.pipe(
       ofType(UserActions.logout),
-      switchMap(() => {
-        this.userService.logout();
-        return of(UserActions.logoutSuccess());
+      tap(() => {
+        // Clear auth token
+        localStorage.removeItem('auth-token');
+        localStorage.removeItem('user-data');
+
+        // Navigate to login page
+        this.router.navigate(['/login']);
+
+
       }),
-      catchError(error => of(UserActions.logoutFailure({ error })))
+      // Dispatch an action to reset the user state to null
+      map(() => UserActions.resetUserState())
     )
   );
 }

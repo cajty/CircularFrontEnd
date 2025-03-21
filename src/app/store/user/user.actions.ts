@@ -19,6 +19,8 @@ export const logoutFailure = createAction(
   props<{ error: any }>()
 );
 
+export const resetUserState = createAction('[User] Reset User State');
+
 
 
 
