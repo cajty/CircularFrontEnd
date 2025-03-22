@@ -13,7 +13,8 @@ export const routes: Routes = [
 
   {
     path: 'auth',
-    children: authRoutes
+    children: authRoutes,
+    canActivate: [authGuard],
   },
 
 
