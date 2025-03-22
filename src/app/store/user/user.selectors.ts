@@ -23,4 +23,7 @@ export const selectIsAuthenticated = createSelector(
   (user) => !!user
 );
 
-
+export const selectUserRoles = createSelector(
+  selectCurrentUser,
+  (user) => user?.roles || []
+);

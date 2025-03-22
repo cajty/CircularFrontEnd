@@ -39,7 +39,7 @@ export class RegisterComponent {
     {  name: 'Philippines', dialCode: '+63' }
   ];
 
-  // Default selected country (Cambodia)
+
   selectedCountry = this.countryOptions[0];
 
   constructor() {
@@ -53,13 +53,9 @@ export class RegisterComponent {
       confirmPassword: ['', [Validators.required]]
     }, { validators: this.passwordMatchValidator });
 
-    // Redirect if already logged in
-    if (this.authService.isLoggedIn()) {
-      this.router.navigate(['/dashboard']);
-    }
   }
 
-  // Custom validator to check if password and confirmPassword match
+
   passwordMatchValidator(form: FormGroup) {
     const password = form.get('password')?.value;
     const confirmPassword = form.get('confirmPassword')?.value;
@@ -109,10 +105,10 @@ export class RegisterComponent {
       .subscribe({
         next: (success) => {
           if(success){
-              this.successMessage = 'Registration successful! You can now log in.';
-          setTimeout(() => {
-            this.router.navigate(['/manager/enterprise-details']);
-          }, 200);
+
+           this.authService.getRouteBasedOnRole().subscribe(routePath => {
+              this.router.navigate([routePath]);
+          });
           }
         },
         error: (error) => {

@@ -9,7 +9,7 @@ import * as UserActions from '../../../store/user/user.actions';
 export class AuthInitializerService {
   private store = inject(Store);
 
-  // Simple function to check token and initialize auth state
+
   initializeAuth(): Promise<boolean> {
     return new Promise((resolve) => {
 

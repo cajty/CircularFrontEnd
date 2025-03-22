@@ -4,7 +4,8 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../../core/services/auth/auth.service';
-import { finalize } from 'rxjs';
+import {delay, finalize} from 'rxjs';
+import {switchMap} from 'rxjs/operators';
 
 @Component({
   selector: 'app-login',
@@ -28,7 +29,6 @@ export class LoginComponent {
      password: ['', [Validators.required, Validators.minLength(8)]]
     });
 
-    // Redirect if already logged in
     if (this.authService.isLoggedIn()) {
       this.router.navigate(['/cities']);
     }
@@ -44,19 +44,21 @@ export class LoginComponent {
     this.errorMessage = '';
 
     this.authService.login(this.loginForm.value)
-      .pipe(
-        finalize(() => this.isLoading = false)
-      )
-      .subscribe({
-        next: (success) => {
-          if(success){
-            this.router.navigate(['/manager/enterprise-details']);
-          }
-        },
-        error: (error) => {
-          this.errorMessage = error?.error?.message || 'Invalid email or password';
-        }
-      });
+  .pipe(
+    finalize(() => this.isLoading = false),
+
+    switchMap(() => this.authService.getRouteBasedOnRole()),
+
+    delay(300)
+  )
+  .subscribe({
+    next: (routePath) => {
+      this.router.navigate([routePath]);
+    },
+    error: (error) => {
+      this.errorMessage = error?.error?.message || 'Invalid email or password';
+    }
+  });
   }
 
   // Helper method to mark all form controls as touched

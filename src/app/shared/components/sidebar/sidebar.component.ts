@@ -3,6 +3,10 @@ import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { Subscription } from 'rxjs';
+import { Store } from '@ngrx/store';
+import {User} from '../../../models/user';
+import {selectCurrentUser} from '../../../store/user/user.selectors';
+
 
 interface SidebarLink {
   icon: string;
@@ -12,11 +16,13 @@ interface SidebarLink {
     text: string;
     type: 'green' | 'blue';
   };
+  roles?: string[]; // Roles allowed to see this link
 }
 
 interface SidebarCategory {
   name: string;
   links: SidebarLink[];
+  roles?: string[]; // Roles allowed to see this category
 }
 
 @Component({
@@ -29,12 +35,17 @@ export class SidebarComponent implements OnInit, OnDestroy {
   isDrawerOpen = signal<boolean>(true);
   isMobile = false;
   isCompletelyHidden = false;
+  currentUser: User | null = null;
+  userRoles: string[] = [];
+
   private breakpointSubscription: Subscription | null = null;
+  private userSubscription: Subscription | null = null;
 
   // Track open/closed state of each category
   openCategories: {[key: string]: boolean} = {};
 
-  categories: SidebarCategory[] = [
+  // Define all possible categories and links
+  allCategories: SidebarCategory[] = [
     {
       name: 'MAIN',
       links: [
@@ -55,21 +66,50 @@ export class SidebarComponent implements OnInit, OnDestroy {
       ]
     },
     {
-      name: 'MANAGEMENT',
+      name: 'ADMIN',
+      roles: ['ADMIN'],
       links: [
-        { icon: 'building', label: 'Enterprise', route: 'admin/enterprises' },
-        { icon: 'location', label: 'Locations', route: '/locations' },
-        { icon: 'category', label: 'Categories', route: '/categories' },
-        { icon: 'transactions', label: 'Transactions', route: '/transactions' },
-        { icon: 'cities', label: 'enterprise-details', route: '/manager/enterprise-details' },
-        { icon: 'cities', label: 'enterprise-form', route: '/manager/enterprise-form' },
+        { icon: 'building', label: 'Enterprises', route: '/admin/enterprises', roles: ['ADMIN'] },
+        { icon: 'category', label: 'Categories', route: '/admin/categories', roles: ['ADMIN'] },
+        { icon: 'cities', label: 'Cities', route: '/admin/cities', roles: ['ADMIN'] }
+      ]
+    },
+    {
+      name: 'MANAGER',
+      roles: ['MANAGER'],
+      links: [
+        { icon: 'location', label: 'Locations', route: '/manager/locations', roles: ['MANAGER'] },
+        { icon: 'building', label: 'Enterprise Details', route: '/manager/enterprise-details', roles: ['MANAGER'] },
+        { icon: 'building', label: 'Enterprise Form', route: '/manager/enterprise-form', roles: ['MANAGER'] },
+        { icon: 'inventory', label: 'Materials', route: '/manager/materials', roles: ['MANAGER'] }
+      ]
+    },
+    {
+      name: 'USER',
+      links: [
+        { icon: 'building', label: 'Enterprise Details', route: '/manager/enterprise-details' },
+        { icon: 'building', label: 'Enterprise Form', route: '/manager/enterprise-form' },
+        { icon: 'transactions', label: 'Transactions', route: '/transactions' }
       ]
     }
   ];
 
-  constructor(private breakpointObserver: BreakpointObserver) {}
+  // Filtered categories based on user roles
+  categories: SidebarCategory[] = [];
+
+  constructor(
+    private breakpointObserver: BreakpointObserver,
+    private store: Store
+  ) {}
 
   ngOnInit() {
+    // Subscribe to user state
+    this.userSubscription = this.store.select(selectCurrentUser).subscribe(user => {
+      this.currentUser = user;
+      this.userRoles = user?.roles || [];
+      this.filterCategoriesByRole();
+    });
+
     // Open first category by default
     if (this.categories.length > 0) {
       this.openCategories[this.categories[0].name] = true;
@@ -104,9 +144,45 @@ export class SidebarComponent implements OnInit, OnDestroy {
       });
   }
 
+  filterCategoriesByRole() {
+    // Filter categories based on user roles
+    this.categories = this.allCategories
+      .filter(category => {
+        // If no roles specified for the category, show it to everyone
+        if (!category.roles) return true;
+
+        // Otherwise, check if user has at least one of the required roles
+        return this.hasAnyRole(category.roles);
+      })
+      .map(category => {
+        // For each category, filter its links based on user roles
+        return {
+          ...category,
+          links: category.links.filter(link => {
+            // If no roles specified for the link, show it to everyone
+            if (!link.roles) return true;
+
+            // Otherwise, check if user has at least one of the required roles
+            return this.hasAnyRole(link.roles);
+          })
+        };
+      })
+      // Only keep categories that have at least one link
+      .filter(category => category.links.length > 0);
+  }
+
+  hasAnyRole(requiredRoles: string[]): boolean {
+    // Check if the user has any of the required roles
+    if (!this.userRoles || this.userRoles.length === 0) return false;
+    return requiredRoles.some(role => this.userRoles.includes(role));
+  }
+
   ngOnDestroy(): void {
     if (this.breakpointSubscription) {
       this.breakpointSubscription.unsubscribe();
+    }
+    if (this.userSubscription) {
+      this.userSubscription.unsubscribe();
     }
   }
 
@@ -124,12 +200,10 @@ export class SidebarComponent implements OnInit, OnDestroy {
     this.isCompletelyHidden = !this.isCompletelyHidden;
     localStorage.setItem('sidebarCompletelyHidden', this.isCompletelyHidden.toString());
 
-
     if (this.isCompletelyHidden) {
       this.isDrawerOpen.set(false);
     }
   }
-
 
   toggleCategory(categoryName: string) {
     this.openCategories[categoryName] = !this.isCategoryOpen(categoryName);
@@ -155,7 +229,6 @@ export class SidebarComponent implements OnInit, OnDestroy {
       'category': 'M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01',
       'transactions': 'M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4',
       'cities': 'M12 2a10 10 0 100 20 10 10 0 000-20z M12 6a6 6 0 100 12 6 6 0 000-12z M12 10a2 2 0 100 4 2 2 0 000-4z',
-
     };
 
     return paths[icon] || '';

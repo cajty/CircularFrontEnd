@@ -1,14 +1,15 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { BehaviorSubject, Observable, throwError, of } from 'rxjs';
-import { catchError, map, tap } from 'rxjs/operators';
+import {BehaviorSubject, Observable, throwError, of, take, from, filter} from 'rxjs';
+import {catchError, map, switchMap, tap} from 'rxjs/operators';
 import { environment } from '../../../../environments/environment';
 import { Router } from '@angular/router';
 import { ToastService } from '../toast/toast.service';
 import { LoginRequest, LoginResponse, RegisterRequest, User } from '../../../models/user';
 import { Store } from '@ngrx/store';
 import * as UserActions from '../../../store/user/user.actions';
-import { selectCurrentUser, selectIsAuthenticated } from '../../../store/user/user.selectors';
+import {selectCurrentUser, selectIsAuthenticated, selectUserRoles} from '../../../store/user/user.selectors';
+
 
 @Injectable({
   providedIn: 'root'
@@ -108,13 +109,35 @@ export class AuthService {
       );
   }
 
-  logout(): void {
-    // Simply dispatch the logout action to the store
-    // The effects will handle the rest
-    this.store.dispatch(UserActions.logout());
-  }
+getRouteBasedOnRole(): Observable<string> {
+  return this.storeCurrentUser$.pipe(
+    take(1),
+    map(user => {
+      if (!user || !user.roles || user.roles.length === 0) {
+        return '/auth/login';
+      }
+
+      // Check roles in order of privilege
+      if (user.roles.includes('ADMIN')) {
+        return '/admin/categories';
+      } else if (user.roles.includes('MANAGER')) {
+        return '/manager/enterprise-details';
+      } else {
+
+        return '/not-mond';
+      }
+    }),
+    catchError(() => {
+
+      console.error('Error determining user route');
+      return of('/not-mond');
+    })
+  );
+}
+
 
   isLoggedIn(): boolean {
+    console.log(!!localStorage.getItem(this.AUTH_TOKEN));
     return !!localStorage.getItem(this.AUTH_TOKEN);
   }
 
@@ -122,7 +145,5 @@ export class AuthService {
     return localStorage.getItem(this.AUTH_TOKEN);
   }
 
-  getCurrentUser(): User | null {
-    return this.currentUserSubject.value;
-  }
+
 }
