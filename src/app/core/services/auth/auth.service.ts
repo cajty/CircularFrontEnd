@@ -120,11 +120,10 @@ getRouteBasedOnRole(): Observable<string> {
       // Check roles in order of privilege
       if (user.roles.includes('ADMIN')) {
         return '/admin/categories';
-      } else if (user.roles.includes('MANAGER')) {
+      } else if (user.roles.includes('MANAGER') || (user.roles.includes('USER'))) {
         return '/manager/enterprise-details';
-      } else {
-
-        return '/not-mond';
+      } else  {
+        return '/zezebeb';
       }
     }),
     catchError(() => {

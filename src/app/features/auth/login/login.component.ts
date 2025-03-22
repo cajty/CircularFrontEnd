@@ -1,4 +1,3 @@
-// src/app/features/auth/login/login.component.ts
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -12,8 +11,7 @@ import {switchMap} from 'rxjs/operators';
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, RouterLink],
   templateUrl: './login.component.html',
-  styleUrls: ['./login.component.css']
-})
+ })
 export class LoginComponent {
   private fb = inject(FormBuilder);
   private authService = inject(AuthService);
@@ -46,10 +44,8 @@ export class LoginComponent {
     this.authService.login(this.loginForm.value)
   .pipe(
     finalize(() => this.isLoading = false),
-
     switchMap(() => this.authService.getRouteBasedOnRole()),
-
-    delay(300)
+    delay(10)
   )
   .subscribe({
     next: (routePath) => {

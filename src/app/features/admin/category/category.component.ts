@@ -47,7 +47,6 @@ export class CategoryComponent implements OnInit {
   totalItems = 0;
   totalPages = 0;
 
-
   searchTerm = '';
   statusFilter = 'all';
   sortOrder = 'name,asc';
@@ -64,7 +63,6 @@ export class CategoryComponent implements OnInit {
       isActive: [true]
     });
 
-
     this.searchSubject.pipe(
       debounceTime(300),
       distinctUntilChanged()
@@ -76,7 +74,6 @@ export class CategoryComponent implements OnInit {
   ngOnInit(): void {
     this.loadCategories();
   }
-
 
   loadCategories(page: number = 0): void {
     this.isLoading = true;
@@ -115,13 +112,12 @@ export class CategoryComponent implements OnInit {
         this.currentPage = data.number;
         this.isLoading = false;
       },
-      error: (error) => {
-        this.showNotification('error', 'Failed to load categories');
+      error: () => {
+        // Let the error interceptor handle the error message
         this.isLoading = false;
       }
     });
   }
-
 
   onSubmit(): void {
     if (this.categoryForm.invalid) {
@@ -134,31 +130,30 @@ export class CategoryComponent implements OnInit {
 
     if (this.isEditing && this.editingCategoryId) {
       this.categoryService.updateCategory(this.editingCategoryId, categoryRequest).subscribe({
-        next: (response) => {
-          this.showNotification('success', 'Category updated successfully');
+        next: () => {
+          this.toastService.success('Category updated successfully');
           this.resetForm();
           this.loadCategories(this.currentPage);
         },
-        error: (error) => {
-          this.showNotification('error', 'Failed to update category');
+        error: () => {
+          // Let the error interceptor handle the error message
           this.isLoading = false;
         }
       });
     } else {
       this.categoryService.createCategory(categoryRequest).subscribe({
-        next: (response) => {
-          this.showNotification('success', 'Category created successfully');
+        next: () => {
+          this.toastService.success('Category created successfully');
           this.resetForm();
           this.loadCategories(this.currentPage);
         },
-        error: (error) => {
-          this.showNotification('error', 'Failed to create category');
+        error: () => {
+          // Let the error interceptor handle the error message
           this.isLoading = false;
         }
       });
     }
   }
-
 
   editCategory(category: CategoryResponse): void {
     this.isEditing = true;
@@ -169,21 +164,17 @@ export class CategoryComponent implements OnInit {
       isActive: category.isActive
     });
 
-
     this.focusAddForm();
   }
-
 
   confirmDelete(category: CategoryResponse): void {
     this.categoryToDelete = category;
   }
 
-
   cancelDelete(): void {
     this.categoryToDelete = null;
     this.isDeleting = false;
   }
-
 
   deleteCategory(): void {
     if (!this.categoryToDelete) return;
@@ -192,18 +183,17 @@ export class CategoryComponent implements OnInit {
 
     this.categoryService.deleteCategory(this.categoryToDelete.id).subscribe({
       next: () => {
-        this.showNotification('success', `Category "${this.categoryToDelete?.name}" deleted successfully`);
+        this.toastService.success(`Category "${this.categoryToDelete?.name}" deleted successfully`);
         this.loadCategories(this.currentPage);
         this.categoryToDelete = null;
         this.isDeleting = false;
       },
-      error: (error) => {
-        this.showNotification('error', 'Failed to delete category. It may be in use by materials.');
+      error: () => {
+        // Let the error interceptor handle the error message
         this.isDeleting = false;
       }
     });
   }
-
 
   toggleCategoryStatus(category: CategoryResponse): void {
     this.isLoading = true;
@@ -211,16 +201,15 @@ export class CategoryComponent implements OnInit {
     this.categoryService.changeCategoryStatus(category.id).subscribe({
       next: () => {
         const statusText = category.isActive ? 'deactivated' : 'activated';
-        this.showNotification('success', `Category "${category.name}" ${statusText} successfully`);
+        this.toastService.success(`Category "${category.name}" ${statusText} successfully`);
         this.loadCategories(this.currentPage);
       },
-      error: (error) => {
-        this.showNotification('error', 'Failed to update category status');
+      error: () => {
+        // Let the error interceptor handle the error message
         this.isLoading = false;
       }
     });
   }
-
 
   viewCategoryDetails(categoryId: number): void {
     this.isLoading = true;
@@ -229,7 +218,6 @@ export class CategoryComponent implements OnInit {
       next: (category) => {
         this.selectedCategory = category;
 
-
         this.categoryStats = {
           materialCount: Math.floor(Math.random() * 50),
           activeMaterials: Math.floor(Math.random() * 30)
@@ -237,26 +225,23 @@ export class CategoryComponent implements OnInit {
 
         this.isLoading = false;
       },
-      error: (error) => {
-        this.showNotification('error', 'Failed to load category details');
+      error: () => {
+        // Let the error interceptor handle the error message
         this.isLoading = false;
       }
     });
   }
-
 
   closeDetails(): void {
     this.selectedCategory = null;
     this.categoryStats = null;
   }
 
-
   resetForm(): void {
     this.categoryForm.reset({ isActive: true });
     this.isEditing = false;
     this.editingCategoryId = null;
   }
-
 
   changePage(page: number): void {
     if (page >= 0 && page < this.totalPages) {
@@ -265,29 +250,24 @@ export class CategoryComponent implements OnInit {
     }
   }
 
-
   onPageSizeChange(): void {
     this.currentPage = 0; // Reset to first page
     this.loadCategories(0);
   }
 
-
   onSearch(): void {
     this.searchSubject.next(this.searchTerm);
   }
-
 
   clearSearch(): void {
     this.searchTerm = '';
     this.applyFilters();
   }
 
-
   applyFilters(): void {
     this.currentPage = 0; // Reset to first page
     this.loadCategories(0);
   }
-
 
   focusAddForm(): void {
     setTimeout(() => {
@@ -297,40 +277,30 @@ export class CategoryComponent implements OnInit {
     }, 100);
   }
 
-
   getPageNumbers(): (number | null)[] {
     const pages: (number | null)[] = [];
     const maxPagesToShow = 5;
 
     if (this.totalPages <= maxPagesToShow) {
-
       for (let i = 0; i < this.totalPages; i++) {
         pages.push(i);
       }
     } else {
-
       pages.push(0);
 
       if (this.currentPage > 1) {
-
         if (this.currentPage > 2) {
           pages.push(null);
         }
-
-
         pages.push(this.currentPage - 1);
       }
-
 
       if (this.currentPage !== 0 && this.currentPage !== this.totalPages - 1) {
         pages.push(this.currentPage);
       }
 
       if (this.currentPage < this.totalPages - 2) {
-
         pages.push(this.currentPage + 1);
-
-
         if (this.currentPage < this.totalPages - 3) {
           pages.push(null);
         }
@@ -343,23 +313,19 @@ export class CategoryComponent implements OnInit {
     return pages;
   }
 
-
+  // Keep this method for success toast notifications only
+  // Don't use it for error notifications
   showNotification(type: 'success' | 'error', message: string): void {
     this.notification = { type, message };
 
     if (type === 'success') {
       this.toastService.success(message);
-    } else {
-      this.toastService.error(message);
     }
-    ;
   }
-
 
   clearNotification(): void {
     this.notification = null;
   }
-
 
   private markFormGroupTouched(formGroup: FormGroup): void {
     Object.values(formGroup.controls).forEach(control => {

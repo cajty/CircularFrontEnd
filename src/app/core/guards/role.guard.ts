@@ -1,53 +1,49 @@
 // src/app/core/guards/role.guard.ts
 import { inject } from '@angular/core';
-import { CanActivateFn, Router, UrlTree } from '@angular/router';
-import { Store } from '@ngrx/store';
-import { map, Observable, of, switchMap, take } from 'rxjs';
-import { selectCurrentUser } from '../../store/user/user.selectors';
+import { CanActivateFn, Router } from '@angular/router';
+import { catchError, map, of } from 'rxjs';
 import { AuthService } from '../services/auth/auth.service';
 
 export function roleGuard(requiredRoles: string[]): CanActivateFn {
-  return (route, state): Observable<boolean | UrlTree> => {
-    const store = inject(Store);
+  return () => {
     const router = inject(Router);
     const authService = inject(AuthService);
 
-    // Prevent redirect loops - if we're already trying to access login/register pages
-    const isAuthRoute = state.url.includes('/auth/') ||
-                        state.url.includes('/login') ||
-                        state.url.includes('/register');
-
-    if (isAuthRoute) {
-      return of(true); // Always allow access to auth routes
+    // No need to check roles if no roles are required
+    if (!requiredRoles || requiredRoles.length === 0) {
+      return true;
     }
 
-    return store.select(selectCurrentUser).pipe(
-      take(1),
-      switchMap(user => {
-        // If no user is found, redirect to login
-        if (!user) {
-          return of(router.createUrlTree(['/auth/login']));
+    // Get current user
+    return authService.currentUser$.pipe(
+      map(user => {
+        // If no user or no roles, deny access
+        if (!user || !user.roles || user.roles.length === 0) {
+          router.navigate(['/auth/login']);
+          return false;
         }
 
         // Check if user has any of the required roles
         const hasRequiredRole = requiredRoles.some(role =>
-          user.roles?.includes(role)
+          user.roles.includes(role)
         );
 
         if (hasRequiredRole) {
-          return of(true);
-        } else {
-          // Store current URL to redirect back after proper authentication
-          localStorage.setItem('redirectUrl', state.url);
-
-          // Get appropriate route based on user's role
-          return authService.getRouteBasedOnRole().pipe(
-            map(route => {
-              console.log(`User lacks required role. Redirecting to: ${route}`);
-              return router.createUrlTree([route]);
-            })
-          );
+          return true;
         }
+
+        const defaultRoute = user.roles.includes('ADMIN')
+          ? '/admin/categories'
+          : user.roles.includes('MANAGER')
+            ? '/manager/locations'
+            : '/auth/login';
+
+        router.navigate([defaultRoute]);
+        return false;
+      }),
+      catchError(() => {
+        router.navigate(['/auth/login']);
+        return of(false);
       })
     );
   };

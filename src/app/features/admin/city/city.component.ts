@@ -2,10 +2,9 @@ import { Component, OnInit, OnDestroy, signal, computed, inject } from '@angular
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Subscription } from 'rxjs';
-import {CityService} from '../../../core/services/city/city.service';
-import {ToastService} from '../../../core/services/toast/toast.service';
-import {CityRequest, CityResponse} from '../../../models/city';
-
+import { CityService } from '../../../core/services/city/city.service';
+import { ToastService } from '../../../core/services/toast/toast.service';
+import { CityRequest, CityResponse } from '../../../models/city';
 
 @Component({
   selector: 'app-city',
@@ -91,9 +90,8 @@ export class CityComponent implements OnInit, OnDestroy {
         this.cities.set(Array.from(data));
         this.isLoading.set(false);
       },
-      error: (error) => {
-        this.toastService.error('Failed to load cities');
-        console.error('Error loading cities', error);
+      error: () => {
+        // Let the interceptor handle the error message
         this.isLoading.set(false);
       }
     });
@@ -123,9 +121,7 @@ export class CityComponent implements OnInit, OnDestroy {
           this.toastService.success(`City "${updatedCity.name}" updated successfully`);
           this.resetForm();
         },
-        error: (error) => {
-          this.toastService.error('Failed to update city');
-          console.error('Error updating city', error);
+        error: () => {
           this.isSubmitting.set(false);
         }
       });
@@ -139,9 +135,7 @@ export class CityComponent implements OnInit, OnDestroy {
           this.toastService.success(`City "${newCity.name}" created successfully`);
           this.resetForm();
         },
-        error: (error) => {
-          this.toastService.error('Failed to create city');
-          console.error('Error creating city', error);
+        error: () => {
           this.isSubmitting.set(false);
         }
       });
@@ -179,9 +173,7 @@ export class CityComponent implements OnInit, OnDestroy {
         this.cancelDelete();
         this.isLoading.set(false);
       },
-      error: (error) => {
-        this.toastService.error('Failed to delete city');
-        console.error('Error deleting city', error);
+      error: () => {
         this.isLoading.set(false);
       }
     });
@@ -215,9 +207,7 @@ export class CityComponent implements OnInit, OnDestroy {
         this.toastService.success(`City "${city?.name}" ${status} successfully`);
         this.isLoading.set(false);
       },
-      error: (error) => {
-        this.toastService.error('Failed to change city status');
-        console.error('Error changing city status', error);
+      error: () => {
         this.isLoading.set(false);
       }
     });
@@ -245,10 +235,8 @@ export class CityComponent implements OnInit, OnDestroy {
 
   sortBy(field: string): void {
     if (this.sortField() === field) {
-      // Toggle direction if clicking the same field
       this.sortDirection.update(dir => dir === 'asc' ? 'desc' : 'asc');
     } else {
-      // Set new field and default to ascending
       this.sortField.set(field);
       this.sortDirection.set('asc');
     }
@@ -263,8 +251,6 @@ export class CityComponent implements OnInit, OnDestroy {
   }
 
   viewCityDetails(id: number, event: Event): void {
-    // This would typically navigate to a city detail page
-    // For this example, we'll just show a toast
     event.stopPropagation();
     const city = this.cities().find(c => c.id === id);
     if (city) {
