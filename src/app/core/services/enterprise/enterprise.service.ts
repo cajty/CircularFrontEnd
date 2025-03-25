@@ -21,14 +21,6 @@ export class EnterpriseService {
 
  getEnterpriseOfUser(): Observable<EnterpriseResponse> {
    return this.http.get<EnterpriseResponse>(`${this.apiUrl}/user`)
-     .pipe(
-       tap(response => {
-         if (response) {
-           console.log(response);
-         }
-       })
-
-     );
  }
 
 

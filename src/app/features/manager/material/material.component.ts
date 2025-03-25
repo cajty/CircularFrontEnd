@@ -104,7 +104,7 @@ export class MaterialComponent implements OnInit {
 
           // If this was a new material, navigate to the edit URL
           if (!this.route.snapshot.paramMap.get('id')) {
-            this.router.navigate(['/materials', material.id]);
+            this.router.navigate(['/manager/materials', material.id]);
           }
         },
         error: (err) => {

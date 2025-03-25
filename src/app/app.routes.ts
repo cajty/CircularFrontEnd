@@ -4,7 +4,9 @@ import { authGuard } from './core/guards/auth.guard';
 import { authRoutes } from "./features/auth/auth.routes";
 import { adminRoutes } from "./features/admin/admin.routes";
 import { managerRoutes } from './features/manager/manager.routes';
+import { userRoutes } from './features/user/user.routes';
 import { roleGuard } from './core/guards/role.guard';
+
 
 export const routes: Routes = [
 
@@ -14,7 +16,6 @@ export const routes: Routes = [
   {
     path: 'auth',
     children: authRoutes,
-    canActivate: [authGuard],
   },
 
 
@@ -27,9 +28,16 @@ export const routes: Routes = [
 
   {
     path: 'manager',
-    canActivate: [authGuard, roleGuard(['MANAGER', 'USER'])],
+    canActivate: [authGuard, roleGuard(['MANAGER'])],
     children: managerRoutes
   },
+
+   {
+    path: 'user',
+    canActivate: [authGuard, roleGuard(['MANAGER', 'USER'])],
+    children: userRoutes
+  },
+
 
 
   { path: 'login', redirectTo: '/auth/login', pathMatch: 'full' },

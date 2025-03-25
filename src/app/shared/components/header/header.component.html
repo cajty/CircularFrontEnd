@@ -9,26 +9,6 @@
         </a>
       </div>
 
-      <!-- Center Navigation - Only show when logged in -->
-      <nav *ngIf="isLoggedIn()" class="hidden md:flex items-center space-x-4">
-        <a [routerLink]="'/dashboard'" routerLinkActive="text-primary"
-           class="px-3 py-2 text-neutral-200 hover:text-white text-sm font-medium transition-colors duration-150">
-          Dashboard
-        </a>
-        <a [routerLink]="'/marketplace'" routerLinkActive="text-primary"
-           class="px-3 py-2 text-neutral-200 hover:text-white text-sm font-medium transition-colors duration-150">
-          Marketplace
-        </a>
-        <a [routerLink]="'/materials'" routerLinkActive="text-primary"
-           class="px-3 py-2 text-neutral-200 hover:text-white text-sm font-medium transition-colors duration-150">
-          Materials
-        </a>
-        <a [routerLink]="'/orders'" routerLinkActive="text-primary"
-           class="px-3 py-2 text-neutral-200 hover:text-white text-sm font-medium transition-colors duration-150">
-          Orders
-        </a>
-      </nav>
-
       <!-- Right actions -->
       <div class="flex items-center space-x-3">
         <!-- Dark Mode Toggle -->
@@ -71,7 +51,6 @@
           </div>
         </div>
 
-        <!-- Login Button - Only show when not logged in -->
         <a *ngIf="!isLoggedIn()" [routerLink]="'/login'" class="text-neutral-200 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors duration-150 hover:bg-neutral-700">
           Login
         </a>
@@ -87,18 +66,6 @@
         </button>
       </div>
     </div>
-  </div>
-
-  <!-- Mobile Navigation Menu - Only show when logged in -->
-  <div *ngIf="isMenuOpen && isLoggedIn()" class="md:hidden py-3 border-t border-neutral-700 bg-secondary animate-fade-in-up">
-    <nav class="container mx-auto px-4">
-      <ul class="space-y-1">
-        <li><a [routerLink]="'/dashboard'" routerLinkActive="bg-neutral-700" class="block py-2 px-3 rounded-md text-white hover:bg-neutral-700 transition-colors duration-150" (click)="isMenuOpen = false">Dashboard</a></li>
-        <li><a [routerLink]="'/marketplace'" routerLinkActive="bg-neutral-700" class="block py-2 px-3 rounded-md text-white hover:bg-neutral-700 transition-colors duration-150" (click)="isMenuOpen = false">Marketplace</a></li>
-        <li><a [routerLink]="'/materials'" routerLinkActive="bg-neutral-700" class="block py-2 px-3 rounded-md text-white hover:bg-neutral-700 transition-colors duration-150" (click)="isMenuOpen = false">Materials</a></li>
-        <li><a [routerLink]="'/orders'" routerLinkActive="bg-neutral-700" class="block py-2 px-3 rounded-md text-white hover:bg-neutral-700 transition-colors duration-150" (click)="isMenuOpen = false">Orders</a></li>
-      </ul>
-    </nav>
   </div>
 </header>
 

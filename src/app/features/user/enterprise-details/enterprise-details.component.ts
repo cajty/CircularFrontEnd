@@ -17,11 +17,12 @@ import {
   VerificationDocumentResponse,
   VerificationStatusUpdateRequest
 } from '../../../models/enterprise-verification';
+import {DocumentViewerComponent} from '../../../shared/components/document-viewer/document-viewer.component';
 
 @Component({
   selector: 'app-enterprise-details',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, FormsModule, RouterModule],
+  imports: [CommonModule, ReactiveFormsModule, FormsModule, RouterModule, DocumentViewerComponent],
   templateUrl: './enterprise-details.component.html',
   styleUrls: ['./enterprise-details.component.css']
 })
@@ -43,6 +44,8 @@ export class EnterpriseDetailsComponent implements OnInit {
   isSubmitting = false;
   isUploadingDocument = false;
   isUpdatingStatus = false;
+
+  creatDocLink : string = '';
 
 
   enterpriseForm!: FormGroup;
@@ -80,6 +83,17 @@ export class EnterpriseDetailsComponent implements OnInit {
     });
   }
 
+  showDocumentViewer = false;
+
+  closeDocumentViewer() {
+    this.showDocumentViewer = false;
+  }
+
+  showDocument(docLink : string): void {
+   this.creatDocLink = docLink;
+    this.showDocumentViewer = true;
+  }
+
 
   loadEnterpriseData(): void {
     this.isLoading = true;
@@ -88,7 +102,7 @@ export class EnterpriseDetailsComponent implements OnInit {
       .subscribe({
         next: (enterprise) => {
            if(enterprise === null){
-             this.router.navigate(['/manager/enterprise-form']);
+             this.router.navigate(['/user/enterprise-form']);
            }
           this.enterprise = enterprise;
           this.enterpriseForm.patchValue({
@@ -98,7 +112,6 @@ export class EnterpriseDetailsComponent implements OnInit {
           });
 
           this.statusUpdateRequest.enterpriseId = enterprise.id;
-          console.log(this.statusUpdateRequest.enterpriseId);
           this.enterpriseId =  enterprise.id;
           this.statusUpdateRequest.newStatus = enterprise.status;
 
@@ -127,6 +140,8 @@ export class EnterpriseDetailsComponent implements OnInit {
         }
       });
   }
+
+
 
 
   saveEnterpriseDetails(): void {
@@ -217,6 +232,8 @@ export class EnterpriseDetailsComponent implements OnInit {
         }
       });
   }
+
+
 
 
   getStatusClass(status: VerificationStatus): string {

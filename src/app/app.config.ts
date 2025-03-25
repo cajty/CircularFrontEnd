@@ -8,7 +8,6 @@ import { authInterceptor } from './core/interceptors/auth.interceptor';
 import { provideAnimations } from '@angular/platform-browser/animations';
 import { AuthInitializerService } from './core/services/auth/auth-initializer.service';
 
-// NgRx importsimport { provideStore } from '@ngrx/store';
 import { provideEffects } from '@ngrx/effects';
 import { provideStoreDevtools } from '@ngrx/store-devtools';
 import { userReducer } from './store/user/user.reducer';

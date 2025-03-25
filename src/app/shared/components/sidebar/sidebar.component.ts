@@ -47,29 +47,10 @@ export class SidebarComponent implements OnInit, OnDestroy {
   // Define all possible categories and links
   allCategories: SidebarCategory[] = [
     {
-      name: 'MAIN',
-      links: [
-        { icon: 'dashboard', label: 'Dashboard', route: '/dashboard' },
-        {
-          icon: 'store',
-          label: 'Marketplace',
-          route: '/marketplace',
-          badge: { text: 'New', type: 'green' }
-        },
-        { icon: 'inventory', label: 'Materials', route: '/materials' },
-        {
-          icon: 'shopping-cart',
-          label: 'Orders',
-          route: '/orders',
-          badge: { text: '3', type: 'blue' }
-        }
-      ]
-    },
-    {
       name: 'ADMIN',
       roles: ['ADMIN'],
       links: [
-        { icon: 'building', label: 'Enterprises', route: '/admin/enterprises', roles: ['ADMIN'] },
+        { icon: 'enterprises', label: 'Enterprises', route: '/admin/enterprises', roles: ['ADMIN'] },
         { icon: 'category', label: 'Categories', route: '/admin/categories', roles: ['ADMIN'] },
         { icon: 'cities', label: 'Cities', route: '/admin/cities', roles: ['ADMIN'] }
       ]
@@ -79,22 +60,21 @@ export class SidebarComponent implements OnInit, OnDestroy {
       roles: ['MANAGER'],
       links: [
         { icon: 'location', label: 'Locations', route: '/manager/locations', roles: ['MANAGER'] },
-        { icon: 'building', label: 'Enterprise Details', route: '/manager/enterprise-details', roles: ['MANAGER'] },
-        { icon: 'building', label: 'Enterprise Form', route: '/manager/enterprise-form', roles: ['MANAGER'] },
         { icon: 'inventory', label: 'Materials', route: '/manager/materials', roles: ['MANAGER'] }
       ]
     },
     {
       name: 'USER',
+       roles: ['USER'],
       links: [
-        { icon: 'building', label: 'Enterprise Details', route: '/manager/enterprise-details' },
-        { icon: 'building', label: 'Enterprise Form', route: '/manager/enterprise-form' },
+        { icon: 'building', label: 'Enterprise Details', route: '/user/enterprise-details' },
+        { icon: 'building', label: 'Enterprise Form', route: '/user/enterprise-form' },
         { icon: 'transactions', label: 'Transactions', route: '/transactions' }
       ]
     }
   ];
 
-  // Filtered categories based on user roles
+
   categories: SidebarCategory[] = [];
 
   constructor(
@@ -115,7 +95,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
       this.openCategories[this.categories[0].name] = true;
     }
 
-    // Load saved sidebar states
+
     const savedState = localStorage.getItem('sidebarOpen');
     this.isDrawerOpen.set(savedState ? savedState === 'true' : true);
 

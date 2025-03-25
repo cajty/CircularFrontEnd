@@ -1,14 +1,14 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, throwError, of, take } from 'rxjs';
-import { catchError, map, tap } from 'rxjs/operators';
+import {Observable, throwError, of, take, filter} from 'rxjs';
+import {catchError, map, switchMap, tap} from 'rxjs/operators';
 import { environment } from '../../../../environments/environment';
 import { Router } from '@angular/router';
 import { ToastService } from '../toast/toast.service';
 import { LoginRequest, LoginResponse, RegisterRequest, User } from '../../../models/user';
 import { Store } from '@ngrx/store';
 import * as UserActions from '../../../store/user/user.actions';
-import { selectCurrentUser, selectIsAuthenticated } from '../../../store/user/user.selectors';
+import {selectCurrentUser, selectIsAuthenticated, selectUserState} from '../../../store/user/user.selectors';
 
 @Injectable({
   providedIn: 'root'
@@ -86,27 +86,50 @@ export class AuthService {
       );
   }
 
-  getRouteBasedOnRole(): Observable<string> {
-    return this.storeCurrentUser$.pipe(
-      take(1),
-      map(user => {
-        if (!user || !user.roles || user.roles.length === 0) {
-          return '/auth/login';
-        }
+// First, create a role-routes mapping
+private readonly roleRouteMap: Record<string, string> = {
+  'ADMIN': '/admin/categories',
+  'MANAGER': '/user/enterprise-details',
+  'USER': '/user/enterprise-details'
+};
 
-        if (user.roles.includes('ADMIN')) {
-          return '/admin/categories';
-        } else if (user.roles.includes('MANAGER') || (user.roles.includes('USER'))) {
-          return '/manager/enterprise-details';
-        } else {
-          return '/auth/login';
+// Default route if no match is found
+private readonly defaultRoute: string = 'user/enterprise-details';
+
+getRouteBasedOnRole(): Observable<string> {
+
+  this.store.dispatch(UserActions.loadCurrentUser());
+
+
+  return this.store.select(selectUserState).pipe(
+    // Wait until loading is false (meaning the loadCurrentUser effect has completed)
+    filter(state => !state.loading),
+    // Take only the first emission after loading completes
+    take(1),
+    // Switch to the user data
+    switchMap(() => this.storeCurrentUser$.pipe(take(1))),
+    // Determine the route based on user roles
+    map(user => {
+      if (!user?.roles?.length) {
+        return this.defaultRoute;
+      }
+
+
+      for (const role of user.roles) {
+        const route = this.roleRouteMap[role];
+        if (route) {
+          return route;
         }
-      }),
-      catchError(() => {
-        return of('/auth/login');
-      })
-    );
-  }
+      }
+
+      // If no matching routes found, return default
+      return this.defaultRoute;
+    }),
+    catchError(() => {
+      return of(this.defaultRoute);
+    })
+  );
+}
 
   isLoggedIn(): boolean {
     return !!localStorage.getItem(this.AUTH_TOKEN);

@@ -13,18 +13,6 @@ import { Routes } from '@angular/router';
                   title: 'Manage Locations'
                 },
                 {
-                  path: 'enterprise-details',
-                  loadComponent: () => import('./enterprise-details/enterprise-details.component')
-                    .then(m => m.EnterpriseDetailsComponent),
-                  title: 'Enterprise Details'
-                },
-                {
-                  path: 'enterprise-form',
-                  loadComponent: () => import('./enterprise-form/enterprise-form.component')
-                    .then(m => m.EnterpriseFormComponent),
-                  title: 'Enterprise Form'
-                },
-                {
                   path: 'materials',
                   children: [
                     {

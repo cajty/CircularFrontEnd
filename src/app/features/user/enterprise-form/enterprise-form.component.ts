@@ -95,7 +95,7 @@ export class EnterpriseFormComponent implements OnInit {
         next: (response) => {
           this.toastService.success('Enterprise registered successfully');
           setTimeout(()=>
-              this.router.navigate(['/manager/enterprise-details']),
+              this.router.navigate(['/user/enterprise-details']),
            2000 )
 
         },

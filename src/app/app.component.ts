@@ -5,11 +5,12 @@ import { RouterOutlet } from '@angular/router';
 import { SidebarComponent } from './shared/components/sidebar/sidebar.component';
 import { HeaderComponent } from './shared/components/header/header.component';
 import { FooterComponent } from './shared/components/footer/footer.component';
+import {DocumentViewerComponent} from './shared/components/document-viewer/document-viewer.component';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, RouterOutlet, HeaderComponent, FooterComponent],
+  imports: [CommonModule, RouterOutlet, HeaderComponent, FooterComponent, DocumentViewerComponent],
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
 })
@@ -43,4 +44,5 @@ export class AppComponent implements OnInit {
     }
     localStorage.setItem('darkMode', isDark.toString());
   }
+
 }

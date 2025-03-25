@@ -34,6 +34,8 @@ export function roleGuard(requiredRoles: string[]): CanActivateFn {
           ? '/admin/categories'
           : user.roles.includes('MANAGER')
             ? '/manager/locations'
+          : user.roles.includes('USER')
+        ? '/user/enterprise-details'
             : '/auth/login';
 
         router.navigate([defaultRoute]);

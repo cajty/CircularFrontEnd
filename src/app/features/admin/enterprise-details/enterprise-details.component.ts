@@ -17,11 +17,12 @@ import {
   VerificationDocumentResponse,
   VerificationStatusUpdateRequest
 } from '../../../models/enterprise-verification';
+import {DocumentViewerComponent} from '../../../shared/components/document-viewer/document-viewer.component';
 
 @Component({
   selector: 'app-enterprise-details',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, FormsModule, RouterModule],
+  imports: [CommonModule, ReactiveFormsModule, FormsModule, RouterModule, DocumentViewerComponent],
   templateUrl: './enterprise-details.component.html',
   styleUrls: ['./enterprise-details.component.css']
 })
@@ -47,6 +48,17 @@ export class EnterpriseDetailsComponent implements OnInit, OnDestroy {
     newStatus: VerificationStatus.PENDING,
     reason: ''
   };
+  creatDocLink : string  = "";
+  showDocumentViewer = false;
+
+  closeDocumentViewer() {
+    this.showDocumentViewer = false;
+  }
+
+  showDocument(docLink : string): void {
+   this.creatDocLink = docLink;
+    this.showDocumentViewer = true;
+  }
 
   // Constants and lookups
   enterpriseTypes = Object.values(EnterpriseType);
