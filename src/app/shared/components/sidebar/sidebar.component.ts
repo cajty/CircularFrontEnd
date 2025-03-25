@@ -65,11 +65,11 @@ export class SidebarComponent implements OnInit, OnDestroy {
     },
     {
       name: 'USER',
-       roles: ['USER'],
+       roles: ['MANAGER', 'USER'],
       links: [
-        { icon: 'building', label: 'Enterprise Details', route: '/user/enterprise-details' },
-        { icon: 'building', label: 'Enterprise Form', route: '/user/enterprise-form' },
-        { icon: 'transactions', label: 'Transactions', route: '/transactions' }
+        { icon: 'building', label: 'Enterprise Details', route: '/user/enterprise-details', roles: ['MANAGER', 'USER'] },
+        { icon: 'building', label: 'Enterprise Form', route: '/user/enterprise-form' ,  roles: ['USER']  },
+        { icon: 'transactions', label: 'Transactions', route: '/transactions' , roles: ['USER'] },
       ]
     }
   ];

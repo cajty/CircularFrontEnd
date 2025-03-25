@@ -118,7 +118,6 @@
                   <th>Document Type</th>
                   <th>File Name</th>
                   <th>Uploaded</th>
-                  <th>Status</th>
                   <th>Actions</th>
                 </tr>
               </thead>
@@ -127,11 +126,6 @@
                   <td>{{ doc.documentType }}</td>
                   <td>{{ doc.fileName }}</td>
                   <td>{{ doc.uploadedAt | date:'medium' }}</td>
-                  <td>
-                    <span [ngClass]="doc.isVerified ? 'badge-green' : 'badge-yellow'" class="badge">
-                      {{ doc.isVerified ? 'Verified' : 'Pending' }}
-                    </span>
-                  </td>
                   <td>
                     <button class="btn-outline btn-small flex items-center" (click)="showDocument(doc.filePath)">
                       <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">

@@ -16,7 +16,6 @@ export interface VerificationDocumentResponse {
   uploadedAt: Date;
   filePath: string;
   uploadedBy: string;
-  isVerified: boolean;
 }
 
 

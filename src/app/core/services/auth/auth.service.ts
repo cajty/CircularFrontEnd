@@ -24,7 +24,7 @@ export class AuthService {
 
   // Store selectors for state access
   public storeCurrentUser$ = this.store.select(selectCurrentUser);
-  public storeIsAuthenticated$ = this.store.select(selectIsAuthenticated);
+
 
   constructor() {
     // If token exists, load the user through the store
@@ -86,7 +86,7 @@ export class AuthService {
       );
   }
 
-// First, create a role-routes mapping
+
 private readonly roleRouteMap: Record<string, string> = {
   'ADMIN': '/admin/categories',
   'MANAGER': '/user/enterprise-details',

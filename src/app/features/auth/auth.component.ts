@@ -6,7 +6,6 @@ import {SidebarComponent} from '../../shared/components/sidebar/sidebar.componen
   selector: 'app-auth',
   imports: [
     RouterOutlet,
-    SidebarComponent
   ],
   templateUrl: './auth.component.html',
   styleUrl: './auth.component.css'

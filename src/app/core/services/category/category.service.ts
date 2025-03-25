@@ -45,7 +45,6 @@ export class CategoryService {
       params = params.set('sort', sort);
     }
 
-    console.log(`Sending request to get all categories with page: ${page}, size: ${size}, sort: ${sort}`);
     return this.http.get<any>(this.apiUrl, { params });
   }
 

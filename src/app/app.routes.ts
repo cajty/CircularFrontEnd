@@ -6,6 +6,8 @@ import { adminRoutes } from "./features/admin/admin.routes";
 import { managerRoutes } from './features/manager/manager.routes';
 import { userRoutes } from './features/user/user.routes';
 import { roleGuard } from './core/guards/role.guard';
+import {ProfileComponent} from './features/user/profile/profile.component';
+import {publicGuard} from './core/guards/public.guard';
 
 
 export const routes: Routes = [
@@ -16,6 +18,7 @@ export const routes: Routes = [
   {
     path: 'auth',
     children: authRoutes,
+    canActivate: [publicGuard],
   },
 
 
@@ -32,10 +35,17 @@ export const routes: Routes = [
     children: managerRoutes
   },
 
+
    {
     path: 'user',
     canActivate: [authGuard, roleGuard(['MANAGER', 'USER'])],
     children: userRoutes
+  },
+    {
+    path: 'profile',
+    component: ProfileComponent,
+    canActivate: [authGuard],
+    title: 'My Profile'
   },
 
 
