@@ -1,0 +1,194 @@
+<div *ngIf="showDocumentViewer">
+  <app-document-viewer
+    [documentUrl]= creatDocLink
+    height="600px"
+    [showControls]="true"
+    (close)="closeDocumentViewer()">
+  </app-document-viewer>
+</div>
+
+<div class="container mx-auto px-4 py-6">
+  <!-- Back button -->
+  <button (click)="goBack()" class="flex items-center text-neutral-600 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white mb-4">
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+    </svg>
+    Back to Enterprises
+  </button>
+
+  <!-- Loading Skeleton -->
+  <div *ngIf="isLoading" class="animate-pulse space-y-6">
+    <div class="h-8 bg-neutral-200 dark:bg-dark-surface rounded w-1/3"></div>
+    <div class="h-64 bg-neutral-200 dark:bg-dark-surface rounded"></div>
+    <div class="h-48 bg-neutral-200 dark:bg-dark-surface rounded"></div>
+  </div>
+
+  <div *ngIf="!isLoading && enterprise">
+    <!-- Page Header -->
+    <div class="mb-6 flex justify-between items-center">
+      <div>
+        <h1 class="text-2xl font-bold text-neutral-900 dark:text-dark-text flex items-center">
+          {{ enterprise.name }}
+          <span [ngClass]="getStatusClass(enterprise.status)" class="badge ml-3">
+            {{ enterprise.status }}
+          </span>
+        </h1>
+        <p class="text-neutral-600 dark:text-dark-text text-sm mt-1">Registration Number: {{ enterprise.registrationNumber }}</p>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div class="lg:col-span-2">
+        <div class="card">
+          <h2 class="text-xl font-semibold mb-4">Enterprise Details</h2>
+
+          <form [formGroup]="enterpriseForm" (ngSubmit)="saveEnterpriseDetails()" class="space-y-4">
+            <!-- Enterprise Name -->
+            <div class="form-group">
+              <label for="name" class="form-label">Enterprise Name</label>
+              <input
+                type="text"
+                id="name"
+                formControlName="name"
+                class="form-input"
+                [ngClass]="{'border-red-500': enterpriseForm.get('name')?.invalid && enterpriseForm.get('name')?.touched}"
+              >
+              <div *ngIf="enterpriseForm.get('name')?.invalid && enterpriseForm.get('name')?.touched" class="form-error">
+                <span *ngIf="enterpriseForm.get('name')?.errors?.['required']">Name is required</span>
+                <span *ngIf="enterpriseForm.get('name')?.errors?.['minlength']">Name must be at least 3 characters</span>
+              </div>
+            </div>
+
+            <!-- Registration Number -->
+            <div class="form-group">
+              <label for="registrationNumber" class="form-label">Registration Number</label>
+              <input
+                type="text"
+                id="registrationNumber"
+                formControlName="registrationNumber"
+                class="form-input"
+                [ngClass]="{'border-red-500': enterpriseForm.get('registrationNumber')?.invalid && enterpriseForm.get('registrationNumber')?.touched}"
+              >
+              <div *ngIf="enterpriseForm.get('registrationNumber')?.invalid && enterpriseForm.get('registrationNumber')?.touched" class="form-error">
+                <span *ngIf="enterpriseForm.get('registrationNumber')?.errors?.['required']">Registration number is required</span>
+                <span *ngIf="enterpriseForm.get('registrationNumber')?.errors?.['pattern']">Registration number must be 5-15 characters and contain only uppercase letters and numbers</span>
+              </div>
+            </div>
+
+            <!-- Enterprise Type -->
+            <div class="form-group">
+              <label for="enterpriseType" class="form-label">Enterprise Type</label>
+              <select
+                id="enterpriseType"
+                formControlName="enterpriseType"
+                class="form-input"
+              >
+                <option *ngFor="let type of enterpriseTypes" [value]="type">{{ type }}</option>
+              </select>
+            </div>
+
+            <!-- Submit Button -->
+            <div class="flex justify-end">
+              <button
+                type="submit"
+                class="btn-primary"
+                [disabled]="isSubmitting || enterpriseForm.invalid"
+              >
+                <span *ngIf="isSubmitting" class="inline-block animate-spin mr-2">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                  </svg>
+                </span>
+                Save Details
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Document Upload Section -->
+        <div class="card mt-6">
+          <h2 class="text-xl font-semibold mb-4">Verification Documents</h2>
+
+          <!-- Upload new document -->
+          <div class="bg-neutral-50 dark:bg-dark-surface p-4 rounded-md border border-neutral-200 dark:border-dark-border mb-6">
+            <h3 class="font-medium text-lg mb-3">Upload New Document</h3>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+              <!-- Document Type -->
+              <div>
+                <label for="document-type" class="form-label">Document Type</label>
+                <select
+                  id="document-type"
+                  [(ngModel)]="selectedDocumentType"
+                  class="form-input"
+                >
+                  <option *ngFor="let type of documentTypes" [value]="type">{{ type }}</option>
+                </select>
+              </div>
+
+              <!-- File Upload -->
+              <div>
+                <label for="document-file" class="form-label">Document File</label>
+                <input
+                  type="file"
+                  id="document-file"
+                  (change)="onFileSelected($event)"
+                  class="form-input p-2"
+                  accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
+                >
+              </div>
+            </div>
+
+            <div class="flex justify-end">
+              <button
+                (click)="uploadDocument()"
+                class="btn-primary"
+                [disabled]="isUploadingDocument || !selectedFile"
+              >
+                <span *ngIf="isUploadingDocument" class="inline-block animate-spin mr-2">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                  </svg>
+                </span>
+                Upload Document
+              </button>
+            </div>
+          </div>
+
+          <!-- Document List -->
+          <div *ngIf="verificationDocuments.length === 0" class="text-center py-8">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto text-neutral-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+            <p class="mt-2 text-neutral-600 dark:text-neutral-400">No verification documents uploaded yet</p>
+          </div>
+
+          <div *ngIf="verificationDocuments.length > 0" class="overflow-x-auto">
+            <table class="table w-full">
+              <thead>
+                <tr>
+                  <th>Document Type</th>
+                  <th>File Name</th>
+                  <th>Uploaded</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let doc of verificationDocuments">
+                  <td>{{ doc.documentType }}</td>
+                  <td>{{ doc.fileName }}</td>
+                  <td>{{ doc.uploadedAt | date:'medium' }}</td>
+                  <td>
+                    <button class="btn-outline btn-small" (click)="showDocument(doc.filePath)" >
+                      View
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      </div>
+    </div>
+</div>

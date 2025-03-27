@@ -1,0 +1,112 @@
+<div class="document-modal" [class.mobile]="isMobile">
+  <!-- Modal Content -->
+  <div class="document-container">
+    <!-- Header -->
+    <div class="document-header">
+      <div class="document-title">
+        <span *ngIf="documentType === 'pdf'" class="pdf-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5">
+            <path d="M5 3a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2V5a2 2 0 00-2-2H5zm0 2h14v14H5V5z"/>
+            <path d="M10 8.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z"/>
+            <path d="M16 14.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z"/>
+            <path d="M10 14.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z"/>
+            <path d="M16 8.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z"/>
+          </svg>
+        </span>
+        <span *ngIf="documentType === 'image'" class="image-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5">
+            <path d="M4 4h16v16H4V4z"/>
+            <path d="M4 16l4-4 4 4 8-8v8H4z"/>
+            <circle cx="15.5" cy="7.5" r="1.5"/>
+          </svg>
+        </span>
+        <span class="title-text">{{ documentName }}</span>
+      </div>
+
+      <div class="document-actions">
+        <button class="action-button" (click)="downloadDocument()" title="Download">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-5 h-5">
+            <path d="M12 15V3m0 12l-4-4m4 4l4-4M2 17l.621 2.485A2 2 0 004.561 21h14.878a2 2 0 001.94-1.515L22 17"/>
+          </svg>
+        </button>
+
+        <button class="action-button" (click)="openInNewTab()" title="Open in New Tab">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-5 h-5">
+            <path d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+          </svg>
+        </button>
+
+        <button class="action-button close-button" (click)="closeViewer()" title="Close">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-5 h-5">
+            <path d="M18 6L6 18M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Document content -->
+    <div class="document-content">
+      <!-- Loading indicator -->
+      <div *ngIf="isLoading" class="loading-container">
+        <div class="spinner"></div>
+        <span>Loading document...</span>
+      </div>
+
+      <!-- Error message -->
+      <div *ngIf="hasError" class="error-container">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="error-icon">
+          <path fill-rule="evenodd" d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm-1 14a1 1 0 112 0 1 1 0 01-2 0zm1-10a1 1 0 00-1 1v5a1 1 0 002 0V7a1 1 0 00-1-1z" clip-rule="evenodd"/>
+        </svg>
+        <span class="error-message">{{ errorMessage }}</span>
+      </div>
+
+      <!-- PDF Viewer -->
+      <iframe
+        *ngIf="safeUrl && (documentType === 'pdf' || documentType === 'unknown') && !hasError"
+        [src]="safeUrl"
+        class="document-iframe"
+        [class.hidden]="isLoading"
+        frameborder="0"
+        allowfullscreen
+      ></iframe>
+
+      <!-- Image Viewer -->
+      <div
+        *ngIf="safeUrl && documentType === 'image' && !hasError"
+        class="image-container"
+        [class.hidden]="isLoading">
+        <img
+          [src]="documentUrl"
+          [style.max-width]="zoomLevel + '%'"
+          class="document-image"
+          alt="Document Preview"
+          (error)="hasError = true; errorMessage = 'Failed to load image.'">
+      </div>
+    </div>
+
+    <!-- Mobile page controls -->
+    <div *ngIf="documentType === 'pdf' && isMobile && !isLoading && !hasError && showControls" class="mobile-controls">
+      <button
+        class="mobile-control prev-page"
+        [class.disabled]="currentPage === 1"
+        [disabled]="currentPage === 1"
+        (click)="previousPage()">
+        <span class="control-text">Previous</span>
+      </button>
+
+      <div class="mobile-page-info">
+        <span class="current-page">{{ currentPage }}</span>
+        <span class="page-divider">/</span>
+        <span class="max-pages">{{ totalPages }}</span>
+      </div>
+
+      <button
+        class="mobile-control next-page"
+        [class.disabled]="currentPage === totalPages"
+        [disabled]="currentPage === totalPages"
+        (click)="nextPage()">
+        <span class="control-text">Next</span>
+      </button>
+    </div>
+  </div>
+</div>

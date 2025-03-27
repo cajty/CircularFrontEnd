@@ -1,0 +1,19 @@
+will have many problem :
+i have to have clear loginc of authing
+i have to have clear loginc of role
+this is for i take may breakfast
+
+--backend
+1. that auth not complete in that part of loging and signup
+2. that role i have to use factory pattern to enser that role
+3. that prot one is to have clear vesion about that role part how how have to dowte
+4. i have to add endpoint to get that loging user
+
+
+--frontend
+1. that chalnge in that part of resgenter for enter and for user
+2. that part of login i have to make better and
+
+
+
+---- win transaction secseful that user location of that martrill will change to that user location

@@ -1,9 +1,8 @@
-// src/app/core/services/city.service.ts
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { environment } from '../../../environments/environment';
-import {CityRequest, CityResponse} from '../../models/city';
+import { environment } from '../../../../environments/environment';
+import {ActiveCityResponse, CityRequest, CityResponse} from '../../../models/city';
 
 @Injectable({
   providedIn: 'root'
@@ -38,4 +37,9 @@ export class CityService {
   changeStatus(id: number): Observable<void> {
     return this.http.get<void>(`${this.apiUrl}/status/${id}`);
   }
+
+
+  getAllActiveCities(): Observable<Set<ActiveCityResponse>> {
+      return this.http.get<Set<ActiveCityResponse>>(`${this.apiUrl}/active`);
+    }
 }

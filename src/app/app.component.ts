@@ -2,14 +2,13 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
-import { SidebarComponent } from './shared/components/sidebar/sidebar.component';
 import { HeaderComponent } from './shared/components/header/header.component';
 import { FooterComponent } from './shared/components/footer/footer.component';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, RouterOutlet, SidebarComponent, HeaderComponent, FooterComponent],
+  imports: [CommonModule, RouterOutlet, HeaderComponent, FooterComponent],
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
 })
@@ -18,13 +17,11 @@ export class AppComponent implements OnInit {
   darkMode = false;
 
   ngOnInit() {
-    // Check for user's dark mode preference
     if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
       this.darkMode = true;
       document.documentElement.classList.add('dark');
     }
 
-    // Check for saved dark mode preference
     const savedDarkMode = localStorage.getItem('darkMode');
     if (savedDarkMode) {
       this.darkMode = savedDarkMode === 'true';
@@ -32,10 +29,6 @@ export class AppComponent implements OnInit {
     }
   }
 
-  toggleDarkMode() {
-    this.darkMode = !this.darkMode;
-    this.setDarkMode(this.darkMode);
-  }
 
   setDarkMode(isDark: boolean) {
     if (isDark) {
@@ -45,4 +38,5 @@ export class AppComponent implements OnInit {
     }
     localStorage.setItem('darkMode', isDark.toString());
   }
+
 }
