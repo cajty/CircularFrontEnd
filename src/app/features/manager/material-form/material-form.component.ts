@@ -93,8 +93,6 @@ export class MaterialFormComponent implements OnInit {
 
     const materialRequest: MaterialRequest = {
       ...this.materialForm.value,
-      // Add any other required fields that might not be in the form
-      userId: this.getUserId() // This should be retrieved from auth service
     };
 
     this.submitting = true;
@@ -125,11 +123,7 @@ export class MaterialFormComponent implements OnInit {
     return d.toISOString().split('T')[0]; // Format as YYYY-MM-DD
   }
 
-  private getUserId(): number {
-    // In a real app, get this from the AuthService
-    // This is just a placeholder
-    return 1;
-  }
+
 
   // Form validation helpers
   hasError(controlName: string, errorName: string): boolean {

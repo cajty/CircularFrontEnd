@@ -3,6 +3,8 @@
     {{ material ? 'Edit' : 'Add New' }} Material
   </h2>
 
+
+
   <form [formGroup]="materialForm" (ngSubmit)="onSubmit()">
     <!-- Mobile-first grid layout -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
@@ -63,26 +65,28 @@
             </div>
           </div>
 
-          <!-- Unit (NEW) -->
+          <!-- Unit -->
           <div class="form-group">
             <label for="unit" class="form-label">
               Unit<span class="text-error ml-1">*</span>
             </label>
-            <select
-              id="unit"
-              formControlName="unit"
-              class="form-input appearance-none bg-white dark:bg-dark-surface pr-8"
-              [ngClass]="{'border-error focus:ring-error': isControlInvalid('unit')}"
-            >
-              <option [ngValue]="null" disabled>Select unit</option>
-              <option *ngFor="let unit of materialUnitOptions" [ngValue]="unit">
-                {{ formatEnumValue(unit) }}
-              </option>
-            </select>
-            <div class="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none mt-6">
-              <svg class="w-4 h-4 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
-                <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
-              </svg>
+            <div class="relative">
+              <select
+                id="unit"
+                formControlName="unit"
+                class="form-input appearance-none bg-white dark:bg-dark-surface pr-8 w-full"
+                [ngClass]="{'border-error focus:ring-error': isControlInvalid('unit')}"
+              >
+                <option [ngValue]="null" disabled>Select unit</option>
+                <option *ngFor="let unit of materialUnitOptions" [ngValue]="unit">
+                  {{ formatEnumValue(unit) }}
+                </option>
+              </select>
+              <div class="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
+                <svg class="w-4 h-4 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                </svg>
+              </div>
             </div>
             <div *ngIf="hasError('unit', 'required')" class="form-error">
               Unit is required
@@ -122,7 +126,7 @@
             <select
               id="status"
               formControlName="status"
-              class="form-input appearance-none bg-white dark:bg-dark-surface pr-8"
+              class="form-input appearance-none bg-white dark:bg-dark-surface pr-8 w-full"
               [ngClass]="{'border-error focus:ring-error': isControlInvalid('status')}"
             >
               <option [ngValue]="null" disabled>Select status</option>
@@ -170,7 +174,7 @@
             <select
               id="hazardLevel"
               formControlName="hazardLevel"
-              class="form-input appearance-none bg-white dark:bg-dark-surface pr-8"
+              class="form-input appearance-none bg-white dark:bg-dark-surface pr-8 w-full"
               [ngClass]="{'border-error focus:ring-error': isControlInvalid('hazardLevel')}"
             >
               <option [ngValue]="null" disabled>Select hazard level</option>

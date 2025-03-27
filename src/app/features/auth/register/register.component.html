@@ -104,6 +104,9 @@
           </div>
           <div *ngIf="registerForm.get('phoneNumber')?.invalid && registerForm.get('phoneNumber')?.touched" class="form-error">
             <span *ngIf="registerForm.get('phoneNumber')?.errors?.['required']">Phone number is mandatory</span>
+            <span *ngIf="registerForm.get('phoneNumber')?.errors?.['pattern']">Phone number must contain only digits</span>
+            <span *ngIf="registerForm.get('phoneNumber')?.errors?.['minlength']">Phone number must be at least 9 digits</span>
+            <span *ngIf="registerForm.get('phoneNumber')?.errors?.['maxlength']">Phone number cannot exceed 15 digits</span>
           </div>
         </div>
 

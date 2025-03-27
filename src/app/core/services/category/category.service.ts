@@ -36,6 +36,8 @@ export class CategoryService {
   }
 
 
+
+
   getAllCategories(page: number = 0, size: number = 10, sort?: string): Observable<any> {
     let params = new HttpParams()
       .set('page', page.toString())

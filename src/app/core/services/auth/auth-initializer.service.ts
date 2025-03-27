@@ -16,9 +16,9 @@ export class AuthInitializerService {
       const token = localStorage.getItem('auth-token');
 
       if (token) {
-        this.store.dispatch(UserActions.loadCurrentUser());
-      }
-
+         localStorage.removeItem('auth-token');
+        this.store.dispatch(UserActions.logout());
+     }
       resolve(true);
     });
   }

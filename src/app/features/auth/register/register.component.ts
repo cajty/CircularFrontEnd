@@ -1,11 +1,10 @@
-// src/app/features/auth/register/register.component.ts
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { finalize } from 'rxjs';
 import { AuthService } from '../../../core/services/auth/auth.service';
-import {RegisterRequest} from '../../../models/user';
+import { RegisterRequest } from '../../../models/user';
 
 @Component({
   selector: 'app-register',
@@ -28,17 +27,16 @@ export class RegisterComponent {
 
   // Available country codes for the dropdown
   countryOptions = [
- {name: 'Morocco', dialCode: '+212'},
-    {  name: 'Cambodia', dialCode: '+855' },
-    {  name: 'United States', dialCode: '+1' },
-    {  name: 'Thailand', dialCode: '+66' },
+    { name: 'Morocco', dialCode: '+212' },
+    { name: 'Cambodia', dialCode: '+855' },
+    { name: 'United States', dialCode: '+1' },
+    { name: 'Thailand', dialCode: '+66' },
     { name: 'Vietnam', dialCode: '+84' },
     { name: 'Singapore', dialCode: '+65' },
-    {  name: 'Malaysia', dialCode: '+60' },
-    {  name: 'Indonesia', dialCode: '+62' },
-    {  name: 'Philippines', dialCode: '+63' }
+    { name: 'Malaysia', dialCode: '+60' },
+    { name: 'Indonesia', dialCode: '+62' },
+    { name: 'Philippines', dialCode: '+63' }
   ];
-
 
   selectedCountry = this.countryOptions[0];
 
@@ -46,15 +44,18 @@ export class RegisterComponent {
     this.registerForm = this.fb.group({
       firstName: ['', [Validators.required]],
       lastName: ['', [Validators.required]],
-      phoneNumber: ['', [Validators.required]],
+      phoneNumber: ['', [
+        Validators.required,
+        Validators.pattern(/^\d+$/),
+        Validators.minLength(9),
+        Validators.maxLength(15)
+      ]],
       countryCode: [this.selectedCountry.dialCode],
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(8), Validators.pattern(this.passwordPattern)]],
       confirmPassword: ['', [Validators.required]]
     }, { validators: this.passwordMatchValidator });
-
   }
-
 
   passwordMatchValidator(form: FormGroup) {
     const password = form.get('password')?.value;
@@ -85,30 +86,30 @@ export class RegisterComponent {
     this.errorMessage = '';
     this.successMessage = '';
 
-    // Normalize phone number to E.164 format
     const countryCode = this.registerForm.value.countryCode;
     const phoneNumber = this.registerForm.value.phoneNumber;
-    const e164PhoneNumber = this.formatToE164(countryCode, phoneNumber);
+
+    // Ensure phone number is formatted correctly with country code
+    const formattedPhoneNumber = this.formatPhoneNumber(countryCode, phoneNumber);
 
     const registerRequest: RegisterRequest = {
       firstName: this.registerForm.value.firstName,
       lastName: this.registerForm.value.lastName,
-      phoneNumber: e164PhoneNumber,
+      phoneNumber: formattedPhoneNumber,
       email: this.registerForm.value.email,
       password: this.registerForm.value.password
     };
 
     this.authService.register(registerRequest)
-       .pipe(
+      .pipe(
         finalize(() => this.isLoading = false)
       )
       .subscribe({
         next: (success) => {
-          if(success){
-
-           this.authService.getRouteBasedOnRole().subscribe(routePath => {
+          if (success) {
+            this.authService.getRouteBasedOnRole().subscribe(routePath => {
               this.router.navigate([routePath]);
-          });
+            });
           }
         },
         error: (error) => {
@@ -117,19 +118,27 @@ export class RegisterComponent {
       });
   }
 
-
-  private formatToE164(countryCode: string, phoneNumber: string): string {
-    // Remove any non-digit characters
+  // Format phone number to ensure it has the country code properly applied
+  private formatPhoneNumber(countryCode: string, phoneNumber: string): string {
+    // Remove any non-digit characters from phone number
     const digitsOnly = phoneNumber.replace(/\D/g, '');
 
-    // If phone starts with 0, remove it
-    const normalizedPhone = digitsOnly.startsWith('0') ? digitsOnly.substring(1) : digitsOnly;
+    // Remove any '+' prefix from country code if present
+    const cleanCountryCode = countryCode.startsWith('+') ? countryCode : `+${countryCode}`;
 
-    // Make sure country code doesn't have + prefix when concatenating
-    const normalizedCountryCode = countryCode.startsWith('+') ?
-      countryCode : `+${countryCode}`;
+    // Remove country code from the beginning of phone number if it's already there
+    const phoneCodePrefix = cleanCountryCode.substring(1); // Remove the '+'
+    let cleanPhoneNumber = digitsOnly;
 
-    return `${normalizedCountryCode}${normalizedPhone}`;
+    if (digitsOnly.startsWith(phoneCodePrefix)) {
+      cleanPhoneNumber = digitsOnly.substring(phoneCodePrefix.length);
+    }
+
+    // Remove leading zeros from phone number
+    cleanPhoneNumber = cleanPhoneNumber.replace(/^0+/, '');
+
+    // Combine country code with phone number
+    return `${cleanCountryCode}${cleanPhoneNumber}`;
   }
 
   private markFormGroupTouched(formGroup: FormGroup): void {

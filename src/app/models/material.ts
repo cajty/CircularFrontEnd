@@ -10,7 +10,6 @@ export interface MaterialRequest {
   hazardLevel: HazardLevel;
   unit: MaterialUnit;
   categoryId: number;
-  userId: number;
   locationId: number;
 }
 

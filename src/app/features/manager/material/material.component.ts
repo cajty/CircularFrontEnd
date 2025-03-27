@@ -106,10 +106,6 @@ export class MaterialComponent implements OnInit {
           if (!this.route.snapshot.paramMap.get('id')) {
             this.router.navigate(['/manager/materials', material.id]);
           }
-        },
-        error: (err) => {
-          console.error('Error saving material', err);
-          this.error = 'Failed to save material. Please check your inputs and try again.';
         }
       });
   }

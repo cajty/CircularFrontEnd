@@ -31,7 +31,6 @@ export class EnterpriseVerificationService {
 
 
 
-
   getDocuments(enterpriseId: number): Observable<VerificationDocumentResponse[]> {
     return this.http.get<VerificationDocumentResponse[]>(
       `${this.apiUrl}/documents/${enterpriseId}`
