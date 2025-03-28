@@ -40,7 +40,7 @@ export class EnterpriseService {
     return this.http.get<EnterpriseResponse>(`${this.apiUrl}/${id}`);
   }
 
-  getAll(page: number = 0, size: number = 10, sort?: string): Observable<any> {
+  getAll(page: number , size: number, sort?: string): Observable<any> {
     let params = new HttpParams()
       .set('page', page.toString())
       .set('size', size.toString());

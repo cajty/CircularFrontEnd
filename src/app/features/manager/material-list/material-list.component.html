@@ -222,7 +222,7 @@
                 {{ formatEnumValue(material.hazardLevel) }}
               </span>
             </td>
-            <td class="hidden md:table-cell">{{ material.category?.name || 'Unknown' }}</td>
+            <td class="hidden md:table-cell">{{ material.category.name || 'Unknown' }}</td>
             <td class="hidden lg:table-cell whitespace-nowrap">{{ material.listedAt | date:'short' }}</td>
             <td class="text-right whitespace-nowrap" (click)="$event.stopPropagation()">
               <button class="btn-outline btn-small flex items-center p-1.5" (click)="viewMaterial(material.id)">

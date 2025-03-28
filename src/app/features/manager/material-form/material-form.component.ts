@@ -95,7 +95,6 @@ export class MaterialFormComponent implements OnInit {
       ...this.materialForm.value,
     };
 
-    this.submitting = true;
     this.formSubmit.emit(materialRequest);
   }
 

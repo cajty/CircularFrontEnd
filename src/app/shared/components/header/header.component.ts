@@ -13,7 +13,7 @@ import * as UserActions from '../../../store/user/user.actions';
   templateUrl: './header.component.html',
   styleUrls: ['./header.component.css'],
   standalone: true,
-  imports: [RouterLink, RouterLinkActive, CommonModule],
+  imports: [RouterLink, CommonModule],
 })
 export class HeaderComponent implements OnInit, OnDestroy {
   isMenuOpen = false;

@@ -1,4 +1,3 @@
-// src/app/core/services/auth/auth-initializer.service.ts
 import { Injectable, inject } from '@angular/core';
 import { Store } from '@ngrx/store';
 import * as UserActions from '../../../store/user/user.actions';
@@ -16,9 +15,11 @@ export class AuthInitializerService {
       const token = localStorage.getItem('auth-token');
 
       if (token) {
-         localStorage.removeItem('auth-token');
-        this.store.dispatch(UserActions.logout());
-     }
+        this.store.dispatch(UserActions.loadCurrentUser());
+      }else{
+      this.store.dispatch(UserActions.logout());
+      }
+
       resolve(true);
     });
   }
